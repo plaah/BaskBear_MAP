@@ -1,19 +1,27 @@
 import 'package:flutter/material.dart';
-import 'Login_screens/onboarding_login_screen.dart';
+import 'package:skillswap/auth/onboarding_screen.dart';
 
 void main() {
-  runApp(const SkillSwapApp());
+  runApp(const MyApp());
 }
 
-class SkillSwapApp extends StatelessWidget {
-  const SkillSwapApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'SkillSwap',
+      theme: ThemeData.dark().copyWith(
+        primaryColor: Colors.blueAccent,
+        scaffoldBackgroundColor: Colors.black,
+        appBarTheme: const AppBarTheme(
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+        ),
+      ),
+      home: const OnboardingScreen(),
       debugShowCheckedModeBanner: false,
-      home: OnboardingScreen(), // <- your starting screen
     );
   }
 }
