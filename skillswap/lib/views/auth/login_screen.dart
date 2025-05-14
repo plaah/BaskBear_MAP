@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:skillswap/auth/signup_screen.dart';
-import '../instructor/instructor_home.dart';
-import '../student/student_home.dart';
+import 'package:skillswap/views/auth/signup_screen.dart';
+import '../dashboard/instructor_dashboard_screen.dart';
+import '../dashboard/student_dashboard_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -98,7 +98,7 @@ class LoginScreen extends StatelessWidget {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const StudentHomeScreen(),
+                        builder: (context) => const StudentDashboardScreen(),
                       ),
                     );
                   } else if (selectedUserType == 'instructor') {

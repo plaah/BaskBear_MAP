@@ -1,9 +1,8 @@
-// lib/screens/instructor/instructor_home.dart
 import 'package:flutter/material.dart';
-import 'instructor_profile.dart';
+import '../profile/student/student_profile_screen.dart';
 
-class InstructorHomeScreen extends StatelessWidget {
-  const InstructorHomeScreen({super.key});
+class StudentDashboardScreen extends StatelessWidget {
+  const StudentDashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -11,7 +10,7 @@ class InstructorHomeScreen extends StatelessWidget {
       backgroundColor: Colors.black,
       appBar: AppBar(
         title: const Text(
-          'Instructor Dashboard',
+          'Student Dashboard',
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
@@ -22,15 +21,9 @@ class InstructorHomeScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const InstructorProfileScreen(),
+                  builder: (context) => const StudentProfileScreen(),
                 ),
               );
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.add, color: Colors.white),
-            onPressed: () {
-              // Add new course functionality
             },
           ),
         ],
@@ -41,7 +34,7 @@ class InstructorHomeScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Welcome back, Instructor!',
+              'Welcome back, Student!',
               style: TextStyle(
                 fontSize: 24,
                 color: Colors.blueAccent,
@@ -57,23 +50,23 @@ class InstructorHomeScreen extends StatelessWidget {
                 crossAxisSpacing: 16,
                 children: [
                   _buildFeatureCard(
-                    icon: Icons.add_circle,
-                    title: 'Create Course',
+                    icon: Icons.search,
+                    title: 'Find Courses',
                     color: Colors.blueAccent,
                   ),
                   _buildFeatureCard(
-                    icon: Icons.library_books,
+                    icon: Icons.book,
                     title: 'My Courses',
                     color: Colors.greenAccent,
                   ),
                   _buildFeatureCard(
-                    icon: Icons.people,
-                    title: 'Students',
+                    icon: Icons.assignment,
+                    title: 'Assignments',
                     color: Colors.orangeAccent,
                   ),
                   _buildFeatureCard(
-                    icon: Icons.analytics,
-                    title: 'Analytics',
+                    icon: Icons.chat,
+                    title: 'Messages',
                     color: Colors.purpleAccent,
                   ),
                 ],

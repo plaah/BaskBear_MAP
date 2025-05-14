@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:skillswap/auth/onboarding_screen.dart';
+import 'package:skillswap/views/onboarding/onboarding_screen.dart';
 
 void main() {
   runApp(const MyApp());
