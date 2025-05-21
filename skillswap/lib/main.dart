@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
       title: 'SkillSwap',
       theme: ThemeData.dark().copyWith(
         primaryColor: Colors.blueAccent,
-        scaffoldBackgroundColor: Colors.black,
+        scaffoldBackgroundColor: Colors.black, // Fallback background
         appBarTheme: const AppBarTheme(
           elevation: 0,
           backgroundColor: Colors.transparent,
