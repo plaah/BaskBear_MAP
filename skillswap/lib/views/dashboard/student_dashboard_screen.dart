@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+// Import your BrowseSessionScreen here (adjust the import path as needed)
+import '../sessions/browse_sessions_screen.dart';// <-- Add this import
 
 class StudentDashboardScreen extends StatelessWidget {
   const StudentDashboardScreen({super.key});
@@ -14,7 +16,7 @@ class StudentDashboardScreen extends StatelessWidget {
         'level': 'Beginner',
         'rating': '4.8',
         'image':
-            'https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=400&q=80',
+        'https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=400&q=80',
       },
       {
         'title': 'Python Bootcamp',
@@ -23,7 +25,7 @@ class StudentDashboardScreen extends StatelessWidget {
         'level': 'Intermediate',
         'rating': '4.9',
         'image':
-            'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=400&q=80',
+        'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=400&q=80',
       },
       {
         'title': 'Marketing 101',
@@ -32,7 +34,7 @@ class StudentDashboardScreen extends StatelessWidget {
         'level': 'Beginner',
         'rating': '4.7',
         'image':
-            'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=400&q=80',
+        'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=400&q=80',
       },
       {
         'title': 'Business Communication',
@@ -41,13 +43,12 @@ class StudentDashboardScreen extends StatelessWidget {
         'level': 'All Levels',
         'rating': '4.5',
         'image':
-            'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=400&q=80',
+        'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=400&q=80',
       },
     ];
 
     const avatarUrl =
-        'https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; // Professional woman headshot
-
+        'https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; // Professional woman headshot...
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -196,6 +197,7 @@ class StudentDashboardScreen extends StatelessWidget {
                     crossAxisSpacing: 16,
                     childAspectRatio: 0.9,
                     children: [
+                      // Modified Find Courses card to navigate on tap
                       _buildFeatureCard(
                         icon: Icons.search_rounded,
                         title: 'Find Courses',
@@ -203,7 +205,15 @@ class StudentDashboardScreen extends StatelessWidget {
                         gradient: LinearGradient(
                           colors: [Colors.blue[800]!, Colors.blue[600]!],
                         ),
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const BrowseSessionScreen(),
+                            ),
+                          );
+                        },
                       ),
+                      // All other cards unchanged
                       _buildFeatureCard(
                         icon: Icons.book_rounded,
                         title: 'My Courses',
@@ -356,11 +366,13 @@ class StudentDashboardScreen extends StatelessWidget {
     );
   }
 
+  // Add onTap parameter to _buildFeatureCard
   static Widget _buildFeatureCard({
     required IconData icon,
     required String title,
     required Color color,
     required Gradient gradient,
+    VoidCallback? onTap, // <-- Add this parameter
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -378,7 +390,7 @@ class StudentDashboardScreen extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(18),
-          onTap: () {},
+          onTap: onTap, // <-- Use the provided onTap
           child: Padding(
             padding: const EdgeInsets.all(12.0),
             child: Column(
