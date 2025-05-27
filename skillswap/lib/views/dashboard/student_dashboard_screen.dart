@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 // Import your BrowseSessionScreen here (adjust the import path as needed)
-import '../sessions/browse_sessions_screen.dart';// <-- Add this import
+import '../sessions/browse_sessions_screen.dart'; // <-- Add this import
 
 class StudentDashboardScreen extends StatelessWidget {
   const StudentDashboardScreen({super.key});
@@ -48,28 +48,27 @@ class StudentDashboardScreen extends StatelessWidget {
     ];
 
     const avatarUrl =
-        'https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; // Professional woman headshot...
+        'https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; // Professional woman headshot
+
     return Scaffold(
+      backgroundColor: const Color(0xFF11131A), // Deep black-blue background
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
             colors: [
-              const Color.fromRGBO(14, 80, 157, 1),
-              const Color.fromRGBO(107, 186, 255, 1),
-              const Color.fromRGBO(193, 218, 255, 1),
+              Color(0xFF001950), // Blackish blue
+              Color(0xFF162447), // Deep blue
+              Color(0xFF1F4068), // Lighter blue
             ],
-            stops: const [0.0, 0.3, 0.7],
+            stops: [0.0, 0.5, 1.0],
           ),
         ),
         child: SafeArea(
           child: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 18.0,
-                vertical: 16,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -79,11 +78,11 @@ class StudentDashboardScreen extends StatelessWidget {
                       Container(
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2),
+                          border: Border.all(color: Colors.blueAccent, width: 2),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.blue.withOpacity(0.3),
-                              blurRadius: 8,
+                              color: Colors.blueAccent.withOpacity(0.35),
+                              blurRadius: 14,
                               spreadRadius: 2,
                             ),
                           ],
@@ -104,9 +103,10 @@ class StudentDashboardScreen extends StatelessWidget {
                                 Text(
                                   'SkillSwap',
                                   style: TextStyle(
-                                    fontSize: 20,
+                                    fontSize: 22,
                                     fontWeight: FontWeight.bold,
-                                    color: const Color.fromARGB(255, 1, 10, 89),
+                                    color: Colors.white,
+                                    letterSpacing: 1.2,
                                   ),
                                 ),
                                 const Spacer(),
@@ -118,7 +118,7 @@ class StudentDashboardScreen extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w600,
-                                color: const Color.fromARGB(255, 255, 255, 255),
+                                color: Colors.white.withOpacity(0.95),
                               ),
                             ),
                             const SizedBox(height: 2),
@@ -126,7 +126,7 @@ class StudentDashboardScreen extends StatelessWidget {
                               'What do you want to learn today?',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: const Color.fromARGB(255, 255, 255, 255),
+                                color: Colors.white.withOpacity(0.7),
                               ),
                             ),
                           ],
@@ -134,13 +134,13 @@ class StudentDashboardScreen extends StatelessWidget {
                       ),
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.blueAccent.withOpacity(0.18),
                           shape: BoxShape.circle,
                         ),
                         child: IconButton(
                           icon: Icon(
                             Icons.notifications_none_rounded,
-                            color: Colors.blue[800],
+                            color: Colors.blueAccent.shade100,
                             size: 28,
                           ),
                           onPressed: () {},
@@ -152,29 +152,28 @@ class StudentDashboardScreen extends StatelessWidget {
                   // Search Bar
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: const Color(0xFF22263A),
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.blue.withOpacity(0.1),
-                          blurRadius: 12,
+                          color: Colors.blueAccent.withOpacity(0.08),
+                          blurRadius: 16,
                           offset: const Offset(0, 4),
                         ),
                       ],
-                      border: Border.all(color: Colors.blue[100]!, width: 1),
+                      border: Border.all(color: Colors.blueAccent.withOpacity(0.11), width: 1),
                     ),
                     child: TextField(
+                      style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         hintText: 'Search for courses, topics, or instructors',
-                        hintStyle: TextStyle(color: Colors.grey[500]),
+                        hintStyle: TextStyle(color: Colors.white.withOpacity(0.35)),
                         prefixIcon: Icon(
                           Icons.search_rounded,
-                          color: Colors.blue[800],
+                          color: Colors.blueAccent.shade100,
                         ),
                         border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 16,
-                        ),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 16),
                       ),
                     ),
                   ),
@@ -185,7 +184,7 @@ class StudentDashboardScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: Colors.blue[900],
+                      color: Colors.white.withOpacity(0.85),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -195,15 +194,16 @@ class StudentDashboardScreen extends StatelessWidget {
                     physics: const NeverScrollableScrollPhysics(),
                     mainAxisSpacing: 16,
                     crossAxisSpacing: 16,
-                    childAspectRatio: 0.9,
+                    childAspectRatio: 0.75, // Lowered for more vertical space
                     children: [
-                      // Modified Find Courses card to navigate on tap
                       _buildFeatureCard(
                         icon: Icons.search_rounded,
                         title: 'Find Courses',
-                        color: Colors.blue[800]!,
-                        gradient: LinearGradient(
-                          colors: [Colors.blue[800]!, Colors.blue[600]!],
+                        color: Colors.blueAccent,
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF1A2980), Color(0xFF26D0CE)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
                         onTap: () {
                           Navigator.of(context).push(
@@ -213,45 +213,54 @@ class StudentDashboardScreen extends StatelessWidget {
                           );
                         },
                       ),
-                      // All other cards unchanged
                       _buildFeatureCard(
                         icon: Icons.book_rounded,
                         title: 'My Courses',
-                        color: Colors.indigo[800]!,
-                        gradient: LinearGradient(
-                          colors: [Colors.indigo[800]!, Colors.indigo[600]!],
+                        color: Colors.indigoAccent,
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF283E51), Color(0xFF485563)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
                       ),
                       _buildFeatureCard(
                         icon: Icons.assignment_turned_in_rounded,
                         title: 'Assignments',
-                        color: Colors.teal[800]!,
-                        gradient: LinearGradient(
-                          colors: [Colors.teal[800]!, Colors.teal[600]!],
+                        color: Colors.tealAccent,
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF134E5E), Color(0xFF71B280)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
                       ),
                       _buildFeatureCard(
                         icon: Icons.chat_bubble_rounded,
                         title: 'Messages',
-                        color: Colors.purple[800]!,
-                        gradient: LinearGradient(
-                          colors: [Colors.purple[800]!, Colors.purple[600]!],
+                        color: Colors.purpleAccent,
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF41295A), Color(0xFF2F0743)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
                       ),
                       _buildFeatureCard(
                         icon: Icons.star_rounded,
                         title: 'Achievements',
-                        color: Colors.amber[800]!,
-                        gradient: LinearGradient(
-                          colors: [Colors.amber[800]!, Colors.amber[600]!],
+                        color: Colors.amberAccent,
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFFFFB347), Color(0xFFFFCC33)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
                       ),
                       _buildFeatureCard(
                         icon: Icons.settings_rounded,
                         title: 'Settings',
-                        color: Colors.grey[800]!,
-                        gradient: LinearGradient(
-                          colors: [Colors.grey[800]!, Colors.grey[600]!],
+                        color: Colors.grey,
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF232526), Color(0xFF414345)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
                       ),
                     ],
@@ -266,7 +275,7 @@ class StudentDashboardScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Colors.blue[900],
+                          color: Colors.white.withOpacity(0.85),
                         ),
                       ),
                       TextButton(
@@ -274,7 +283,7 @@ class StudentDashboardScreen extends StatelessWidget {
                         child: Text(
                           'See All',
                           style: TextStyle(
-                            color: Colors.blue[800],
+                            color: Colors.blueAccent.shade100,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -305,8 +314,8 @@ class StudentDashboardScreen extends StatelessWidget {
       bottomNavigationBar: Container(
         height: 80,
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.blue[900]!, Colors.blue[700]!],
+          gradient: const LinearGradient(
+            colors: [Color(0xFF11131A), Color(0xFF1F4068)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -316,8 +325,8 @@ class StudentDashboardScreen extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.blue.withOpacity(0.3),
-              blurRadius: 20,
+              color: Colors.blueAccent.withOpacity(0.18),
+              blurRadius: 24,
               spreadRadius: 2,
             ),
           ],
@@ -366,13 +375,13 @@ class StudentDashboardScreen extends StatelessWidget {
     );
   }
 
-  // Add onTap parameter to _buildFeatureCard
+  // Feature Card Builder
   static Widget _buildFeatureCard({
     required IconData icon,
     required String title,
     required Color color,
     required Gradient gradient,
-    VoidCallback? onTap, // <-- Add this parameter
+    VoidCallback? onTap,
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -380,9 +389,9 @@ class StudentDashboardScreen extends StatelessWidget {
         gradient: gradient,
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            color: color.withOpacity(0.37),
+            blurRadius: 18,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
@@ -390,28 +399,38 @@ class StudentDashboardScreen extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(18),
-          onTap: onTap, // <-- Use the provided onTap
+          onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.all(12.0),
+            padding: const EdgeInsets.all(8.0), // Reduced padding
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withOpacity(0.07),
                     shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: color.withOpacity(0.25),
+                        blurRadius: 16,
+                        spreadRadius: 1,
+                      ),
+                    ],
                   ),
-                  padding: const EdgeInsets.all(12),
-                  child: Icon(icon, size: 24, color: Colors.white),
+                  padding: const EdgeInsets.all(10), // Reduced icon padding
+                  child: Icon(icon, size: 22, color: Colors.white), // Reduced icon size
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8), // Reduced spacing
                 Text(
                   title,
                   textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 14,
+                    fontSize: 13, // Reduced font size
                     fontWeight: FontWeight.w600,
+                    letterSpacing: 0.2,
                   ),
                 ),
               ],
@@ -422,20 +441,21 @@ class StudentDashboardScreen extends StatelessWidget {
     );
   }
 
+  // Course Card Builder
   static Widget _buildCourseCard(Map<String, String> course) {
     return Container(
       width: 180,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFF23263A),
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.blue.withOpacity(0.1),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
+            color: Colors.blueAccent.withOpacity(0.12),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
           ),
         ],
-        border: Border.all(color: Colors.blue[50]!, width: 1),
+        border: Border.all(color: Colors.blueAccent.withOpacity(0.13), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -449,6 +469,13 @@ class StudentDashboardScreen extends StatelessWidget {
                   height: 100,
                   width: double.infinity,
                   fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    height: 100,
+                    color: Colors.grey[900],
+                    child: const Center(
+                      child: Icon(Icons.broken_image, color: Colors.white38, size: 40),
+                    ),
+                  ),
                 ),
                 Positioned(
                   top: 8,
@@ -459,8 +486,15 @@ class StudentDashboardScreen extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.blue[800],
+                      color: Colors.blueAccent,
                       borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.blueAccent.withOpacity(0.25),
+                          blurRadius: 8,
+                          spreadRadius: 1,
+                        ),
+                      ],
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -492,7 +526,7 @@ class StudentDashboardScreen extends StatelessWidget {
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
-                    color: Colors.blue[900],
+                    color: Colors.white.withOpacity(0.92),
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -500,16 +534,16 @@ class StudentDashboardScreen extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   course['instructor']!,
-                  style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                  style: TextStyle(fontSize: 13, color: Colors.white.withOpacity(0.6)),
                 ),
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    Icon(Icons.schedule, color: Colors.grey[600], size: 16),
+                    Icon(Icons.schedule, color: Colors.white.withOpacity(0.5), size: 16),
                     const SizedBox(width: 4),
                     Text(
                       course['duration']!,
-                      style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: 13, color: Colors.white.withOpacity(0.6)),
                     ),
                     const Spacer(),
                     Container(
@@ -518,14 +552,14 @@ class StudentDashboardScreen extends StatelessWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.blue[50],
+                        color: Colors.blueAccent.withOpacity(0.13),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         course['level']!,
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.blue[800],
+                          color: Colors.blueAccent.shade100,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
