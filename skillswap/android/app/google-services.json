@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "743892608847",
+    "project_id": "skillswap-baskbear",
+    "storage_bucket": "skillswap-baskbear.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:743892608847:android:9cefd55c940eb89bb2c73a",
+        "android_client_info": {
+          "package_name": "com.example.skillswap"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDVjHxkRuH_Q33Vzmhxyv-B-0IsGnaJCLY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
