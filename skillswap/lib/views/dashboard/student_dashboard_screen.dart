@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-// Import your BrowseSessionScreen here (adjust the import path as needed)
+
+// Import your BrowseSessionScreen and StudentProfileScreen here
 import '../sessions/browse_sessions_screen.dart';
+import '../profile/student/student_profile_screen.dart';
 
 class StudentDashboardScreen extends StatelessWidget {
   const StudentDashboardScreen({super.key});
@@ -403,7 +405,13 @@ class StudentDashboardScreen extends StatelessWidget {
                   color: Colors.white.withOpacity(0.7),
                   size: 26,
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const StudentProfileScreen(),
+                    ),
+                  );
+                },
               ),
             ],
           ),
