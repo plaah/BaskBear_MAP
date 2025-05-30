@@ -1,9 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 // Import your BrowseSessionScreen here (adjust the import path as needed)
-import '../sessions/browse_sessions_screen.dart'; // <-- Add this import
+import '../sessions/browse_sessions_screen.dart';
 
 class StudentDashboardScreen extends StatelessWidget {
   const StudentDashboardScreen({super.key});
+
+  // Fetch the user's full name from Firestore using their UID
+  Future<String?> getUserName() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return null;
+    final doc =
+        await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    return doc.data()?['fullName'] as String?;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +27,7 @@ class StudentDashboardScreen extends StatelessWidget {
         'level': 'Beginner',
         'rating': '4.8',
         'image':
-        'https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=400&q=80',
+            'https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=400&q=80',
       },
       {
         'title': 'Python Bootcamp',
@@ -25,7 +36,7 @@ class StudentDashboardScreen extends StatelessWidget {
         'level': 'Intermediate',
         'rating': '4.9',
         'image':
-        'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=400&q=80',
+            'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=400&q=80',
       },
       {
         'title': 'Marketing 101',
@@ -34,7 +45,7 @@ class StudentDashboardScreen extends StatelessWidget {
         'level': 'Beginner',
         'rating': '4.7',
         'image':
-        'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=400&q=80',
+            'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=400&q=80',
       },
       {
         'title': 'Business Communication',
@@ -43,32 +54,31 @@ class StudentDashboardScreen extends StatelessWidget {
         'level': 'All Levels',
         'rating': '4.5',
         'image':
-        'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=400&q=80',
+            'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=400&q=80',
       },
     ];
 
     const avatarUrl =
-        'https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; // Professional woman headshot
+        'https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
 
     return Scaffold(
-      backgroundColor: const Color(0xFF11131A), // Deep black-blue background
+      backgroundColor: const Color(0xFF11131A),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF001950), // Blackish blue
-              Color(0xFF162447), // Deep blue
-              Color(0xFF1F4068), // Lighter blue
-            ],
+            colors: [Color(0xFF001950), Color(0xFF162447), Color(0xFF1F4068)],
             stops: [0.0, 0.5, 1.0],
           ),
         ),
         child: SafeArea(
           child: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 16),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 18.0,
+                vertical: 16,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -78,7 +88,10 @@ class StudentDashboardScreen extends StatelessWidget {
                       Container(
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.blueAccent, width: 2),
+                          border: Border.all(
+                            color: Colors.blueAccent,
+                            width: 2,
+                          ),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.blueAccent.withOpacity(0.35),
@@ -113,13 +126,30 @@ class StudentDashboardScreen extends StatelessWidget {
                               ],
                             ),
                             const SizedBox(height: 4),
-                            Text(
-                              'Hi, Jessica! 👋',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white.withOpacity(0.95),
-                              ),
+                            FutureBuilder<String?>(
+                              future: getUserName(),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const Text(
+                                    'Hi! 👋',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  );
+                                }
+                                final name = snapshot.data ?? 'User';
+                                return Text(
+                                  'Hi, $name! 👋',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white.withOpacity(0.95),
+                                  ),
+                                );
+                              },
                             ),
                             const SizedBox(height: 2),
                             Text(
@@ -161,19 +191,26 @@ class StudentDashboardScreen extends StatelessWidget {
                           offset: const Offset(0, 4),
                         ),
                       ],
-                      border: Border.all(color: Colors.blueAccent.withOpacity(0.11), width: 1),
+                      border: Border.all(
+                        color: Colors.blueAccent.withOpacity(0.11),
+                        width: 1,
+                      ),
                     ),
                     child: TextField(
                       style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         hintText: 'Search for courses, topics, or instructors',
-                        hintStyle: TextStyle(color: Colors.white.withOpacity(0.35)),
+                        hintStyle: TextStyle(
+                          color: Colors.white.withOpacity(0.35),
+                        ),
                         prefixIcon: Icon(
                           Icons.search_rounded,
                           color: Colors.blueAccent.shade100,
                         ),
                         border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                        ),
                       ),
                     ),
                   ),
@@ -194,7 +231,7 @@ class StudentDashboardScreen extends StatelessWidget {
                     physics: const NeverScrollableScrollPhysics(),
                     mainAxisSpacing: 16,
                     crossAxisSpacing: 16,
-                    childAspectRatio: 0.75, // Lowered for more vertical space
+                    childAspectRatio: 0.75,
                     children: [
                       _buildFeatureCard(
                         icon: Icons.search_rounded,
@@ -401,7 +438,7 @@ class StudentDashboardScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(18),
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.all(8.0), // Reduced padding
+            padding: const EdgeInsets.all(8.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -417,10 +454,10 @@ class StudentDashboardScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  padding: const EdgeInsets.all(10), // Reduced icon padding
-                  child: Icon(icon, size: 22, color: Colors.white), // Reduced icon size
+                  padding: const EdgeInsets.all(10),
+                  child: Icon(icon, size: 22, color: Colors.white),
                 ),
-                const SizedBox(height: 8), // Reduced spacing
+                const SizedBox(height: 8),
                 Text(
                   title,
                   textAlign: TextAlign.center,
@@ -428,7 +465,7 @@ class StudentDashboardScreen extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 13, // Reduced font size
+                    fontSize: 13,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.2,
                   ),
@@ -455,7 +492,10 @@ class StudentDashboardScreen extends StatelessWidget {
             offset: const Offset(0, 8),
           ),
         ],
-        border: Border.all(color: Colors.blueAccent.withOpacity(0.13), width: 1),
+        border: Border.all(
+          color: Colors.blueAccent.withOpacity(0.13),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -469,13 +509,18 @@ class StudentDashboardScreen extends StatelessWidget {
                   height: 100,
                   width: double.infinity,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Container(
-                    height: 100,
-                    color: Colors.grey[900],
-                    child: const Center(
-                      child: Icon(Icons.broken_image, color: Colors.white38, size: 40),
-                    ),
-                  ),
+                  errorBuilder:
+                      (context, error, stackTrace) => Container(
+                        height: 100,
+                        color: Colors.grey[900],
+                        child: const Center(
+                          child: Icon(
+                            Icons.broken_image,
+                            color: Colors.white38,
+                            size: 40,
+                          ),
+                        ),
+                      ),
                 ),
                 Positioned(
                   top: 8,
@@ -534,16 +579,26 @@ class StudentDashboardScreen extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   course['instructor']!,
-                  style: TextStyle(fontSize: 13, color: Colors.white.withOpacity(0.6)),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.white.withOpacity(0.6),
+                  ),
                 ),
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    Icon(Icons.schedule, color: Colors.white.withOpacity(0.5), size: 16),
+                    Icon(
+                      Icons.schedule,
+                      color: Colors.white.withOpacity(0.5),
+                      size: 16,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       course['duration']!,
-                      style: TextStyle(fontSize: 13, color: Colors.white.withOpacity(0.6)),
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.white.withOpacity(0.6),
+                      ),
                     ),
                     const Spacer(),
                     Container(
