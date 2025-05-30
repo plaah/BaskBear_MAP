@@ -1,15 +1,64 @@
 import 'package:flutter/material.dart';
-import 'package:skillswap/views/dashboard/instructor_dashboard_screen.dart';
-import 'package:skillswap/views/auth/login_screen.dart';
+import 'package:skillswap/services/auth_service.dart';
+import '../dashboard/instructor_dashboard_screen.dart';
 import '../dashboard/student_dashboard_screen.dart';
+import 'login_screen.dart';
 
-class SignupScreen extends StatelessWidget {
+class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    String? selectedUserType;
+  State<SignupScreen> createState() => _SignupScreenState();
+}
 
+class _SignupScreenState extends State<SignupScreen> {
+  final TextEditingController _fullNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  String? _selectedUserType;
+  bool _isLoading = false;
+
+  final AuthService _authService = AuthService();
+
+  void _signUp() async {
+    if (_selectedUserType == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please select user type')));
+      return;
+    }
+    setState(() => _isLoading = true);
+    try {
+      final user = await _authService.signUp(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+        fullName: _fullNameController.text.trim(),
+        userType: _selectedUserType!,
+      );
+      if (user != null) {
+        if (_selectedUserType == 'student') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const StudentDashboardScreen()),
+          );
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const InstructorHomeScreen()),
+          );
+        }
+      }
+    } on Exception catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
@@ -28,6 +77,7 @@ class SignupScreen extends StatelessWidget {
               ),
               const SizedBox(height: 40),
               TextField(
+                controller: _fullNameController,
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   labelText: 'Full Name',
@@ -44,6 +94,7 @@ class SignupScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               TextField(
+                controller: _emailController,
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   labelText: 'Email',
@@ -60,6 +111,7 @@ class SignupScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               TextField(
+                controller: _passwordController,
                 obscureText: true,
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
@@ -90,7 +142,7 @@ class SignupScreen extends StatelessWidget {
                     labelText: 'Sign up as',
                     labelStyle: TextStyle(color: Colors.white70),
                   ),
-                  value: selectedUserType,
+                  value: _selectedUserType,
                   items: const [
                     DropdownMenuItem(value: 'student', child: Text('Student')),
                     DropdownMenuItem(
@@ -99,39 +151,26 @@ class SignupScreen extends StatelessWidget {
                     ),
                   ],
                   onChanged: (value) {
-                    selectedUserType = value;
+                    setState(() {
+                      _selectedUserType = value;
+                    });
                   },
                 ),
               ),
               const SizedBox(height: 30),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent,
-                  minimumSize: const Size(double.infinity, 50),
-                ),
-                onPressed: () {
-                  if (selectedUserType == 'student') {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const StudentDashboardScreen(),
-                      ),
-                    );
-                  } else if (selectedUserType == 'instructor') {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const InstructorHomeScreen(),
-                      ),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Please select user type')),
-                    );
-                  }
-                },
-                child: const Text('Sign Up', style: TextStyle(fontSize: 18)),
-              ),
+              _isLoading
+                  ? const CircularProgressIndicator()
+                  : ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      minimumSize: const Size(double.infinity, 50),
+                    ),
+                    onPressed: _signUp,
+                    child: const Text(
+                      'Sign Up',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
               const SizedBox(height: 20),
               TextButton(
                 onPressed: () {
