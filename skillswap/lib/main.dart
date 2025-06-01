@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:skillswap/views/onboarding/onboarding_screen.dart';
+import 'package:skillswap/viewmodels/auth_view_model.dart';
+import 'package:skillswap/services/auth_service.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,18 +19,21 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'SkillSwap',
-      theme: ThemeData.dark().copyWith(
-        primaryColor: Colors.blueAccent,
-        scaffoldBackgroundColor: Colors.black, // Fallback background
-        appBarTheme: const AppBarTheme(
-          elevation: 0,
-          backgroundColor: Colors.transparent,
+    return ChangeNotifierProvider(
+      create: (_) => AuthViewModel(AuthService()),
+      child: MaterialApp(
+        title: 'SkillSwap',
+        theme: ThemeData.dark().copyWith(
+          primaryColor: Colors.blueAccent,
+          scaffoldBackgroundColor: Colors.black,
+          appBarTheme: const AppBarTheme(
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+          ),
         ),
+        home: const OnboardingScreen(),
+        debugShowCheckedModeBanner: false,
       ),
-      home: const OnboardingScreen(),
-      debugShowCheckedModeBanner: false,
     );
   }
 }
