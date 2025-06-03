@@ -1,4 +1,3 @@
-
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -29,8 +28,8 @@ class _SignupScreenState extends State<SignupScreen> {
 
   String? _selectedRole;
   File? _profileImage;
-  List<String> _skills = [];
-  List<String> _certifications = [];
+  final List<String> _skills = [];
+  final List<String> _certifications = [];
   bool _passwordVisible = false;
 
   @override
@@ -59,9 +58,9 @@ class _SignupScreenState extends State<SignupScreen> {
         setState(() => _profileImage = File(picked.path));
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to pick image: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to pick image: $e')));
     }
   }
 
@@ -151,10 +150,7 @@ class _SignupScreenState extends State<SignupScreen> {
     return Consumer<AuthViewModel>(
       builder: (context, authViewModel, child) {
         return Scaffold(
-          appBar: AppBar(
-            title: const Text('Sign Up'),
-            elevation: 0,
-          ),
+          appBar: AppBar(title: const Text('Sign Up'), elevation: 0),
           body: SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Form(
@@ -179,8 +175,10 @@ class _SignupScreenState extends State<SignupScreen> {
                       border: OutlineInputBorder(),
                     ),
                     validator: (v) {
-                      if (v == null || v.trim().isEmpty) return 'Full name is required';
-                      if (v.trim().length < 2) return 'Name must be at least 2 characters';
+                      if (v == null || v.trim().isEmpty)
+                        return 'Full name is required';
+                      if (v.trim().length < 2)
+                        return 'Name must be at least 2 characters';
                       return null;
                     },
                   ),
@@ -195,8 +193,11 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                     keyboardType: TextInputType.emailAddress,
                     validator: (v) {
-                      if (v == null || v.trim().isEmpty) return 'Email is required';
-                      if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(v)) {
+                      if (v == null || v.trim().isEmpty)
+                        return 'Email is required';
+                      if (!RegExp(
+                        r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                      ).hasMatch(v)) {
                         return 'Please enter a valid email';
                       }
                       return null;
@@ -210,15 +211,23 @@ class _SignupScreenState extends State<SignupScreen> {
                       labelText: 'Password',
                       prefixIcon: const Icon(Icons.lock),
                       suffixIcon: IconButton(
-                        icon: Icon(_passwordVisible ? Icons.visibility : Icons.visibility_off),
-                        onPressed: () => setState(() => _passwordVisible = !_passwordVisible),
+                        icon: Icon(
+                          _passwordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                        ),
+                        onPressed:
+                            () => setState(
+                              () => _passwordVisible = !_passwordVisible,
+                            ),
                       ),
                       border: const OutlineInputBorder(),
                     ),
                     obscureText: !_passwordVisible,
                     validator: (v) {
                       if (v == null || v.isEmpty) return 'Password is required';
-                      if (v.length < 6) return 'Password must be at least 6 characters';
+                      if (v.length < 6)
+                        return 'Password must be at least 6 characters';
                       return null;
                     },
                   ),
@@ -232,7 +241,8 @@ class _SignupScreenState extends State<SignupScreen> {
                       border: OutlineInputBorder(),
                     ),
                     validator: (v) {
-                      if (v == null || v.trim().isEmpty) return 'Location is required';
+                      if (v == null || v.trim().isEmpty)
+                        return 'Location is required';
                       return null;
                     },
                   ),
@@ -246,8 +256,14 @@ class _SignupScreenState extends State<SignupScreen> {
                       border: OutlineInputBorder(),
                     ),
                     items: const [
-                      DropdownMenuItem(value: 'student', child: Text('Student')),
-                      DropdownMenuItem(value: 'instructor', child: Text('Instructor')),
+                      DropdownMenuItem(
+                        value: 'student',
+                        child: Text('Student'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'instructor',
+                        child: Text('Instructor'),
+                      ),
                     ],
                     onChanged: (role) => setState(() => _selectedRole = role),
                     validator: (v) => v == null ? 'Please select a role' : null,
@@ -259,7 +275,10 @@ class _SignupScreenState extends State<SignupScreen> {
                     const Divider(),
                     const Text(
                       'Instructor Details',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 16),
 
@@ -269,19 +288,23 @@ class _SignupScreenState extends State<SignupScreen> {
                         children: [
                           CircleAvatar(
                             radius: 50,
-                            backgroundImage: _profileImage != null 
-                                ? FileImage(_profileImage!)
-                                : null,
-                            child: _profileImage == null 
-                                ? const Icon(Icons.person, size: 50)
-                                : null,
+                            backgroundImage:
+                                _profileImage != null
+                                    ? FileImage(_profileImage!)
+                                    : null,
+                            child:
+                                _profileImage == null
+                                    ? const Icon(Icons.person, size: 50)
+                                    : null,
                           ),
                           const SizedBox(height: 8),
                           TextButton.icon(
                             icon: const Icon(Icons.upload),
-                            label: Text(_profileImage == null 
-                                ? 'Upload Profile Photo' 
-                                : 'Change Photo'),
+                            label: Text(
+                              _profileImage == null
+                                  ? 'Upload Profile Photo'
+                                  : 'Change Photo',
+                            ),
                             onPressed: _pickImage,
                           ),
                         ],
@@ -308,10 +331,18 @@ class _SignupScreenState extends State<SignupScreen> {
                       const SizedBox(height: 8),
                       Wrap(
                         spacing: 8,
-                        children: _skills.map((skill) => Chip(
-                          label: Text(skill),
-                          onDeleted: () => setState(() => _skills.remove(skill)),
-                        )).toList(),
+                        children:
+                            _skills
+                                .map(
+                                  (skill) => Chip(
+                                    label: Text(skill),
+                                    onDeleted:
+                                        () => setState(
+                                          () => _skills.remove(skill),
+                                        ),
+                                  ),
+                                )
+                                .toList(),
                       ),
                     ],
                     const SizedBox(height: 16),
@@ -326,9 +357,11 @@ class _SignupScreenState extends State<SignupScreen> {
                       keyboardType: TextInputType.number,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       validator: (v) {
-                        if (v == null || v.isEmpty) return 'Experience is required';
+                        if (v == null || v.isEmpty)
+                          return 'Experience is required';
                         final years = int.tryParse(v);
-                        if (years == null || years < 0) return 'Please enter valid years';
+                        if (years == null || years < 0)
+                          return 'Please enter valid years';
                         return null;
                       },
                     ),
@@ -343,7 +376,8 @@ class _SignupScreenState extends State<SignupScreen> {
                         border: OutlineInputBorder(),
                       ),
                       validator: (v) {
-                        if (v == null || v.trim().isEmpty) return 'Professional link is required';
+                        if (v == null || v.trim().isEmpty)
+                          return 'Professional link is required';
                         return null;
                       },
                     ),
@@ -360,8 +394,10 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                       maxLines: 3,
                       validator: (v) {
-                        if (v == null || v.trim().isEmpty) return 'Description is required';
-                        if (v.trim().length < 20) return 'Please provide more details (at least 20 characters)';
+                        if (v == null || v.trim().isEmpty)
+                          return 'Description is required';
+                        if (v.trim().length < 20)
+                          return 'Please provide more details (at least 20 characters)';
                         return null;
                       },
                     ),
@@ -386,10 +422,21 @@ class _SignupScreenState extends State<SignupScreen> {
                       const SizedBox(height: 8),
                       Wrap(
                         spacing: 8,
-                        children: _certifications.map((cert) => Chip(
-                          label: Text(cert, overflow: TextOverflow.ellipsis),
-                          onDeleted: () => setState(() => _certifications.remove(cert)),
-                        )).toList(),
+                        children:
+                            _certifications
+                                .map(
+                                  (cert) => Chip(
+                                    label: Text(
+                                      cert,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    onDeleted:
+                                        () => setState(
+                                          () => _certifications.remove(cert),
+                                        ),
+                                  ),
+                                )
+                                .toList(),
                       ),
                     ],
                     const SizedBox(height: 24),
@@ -400,25 +447,31 @@ class _SignupScreenState extends State<SignupScreen> {
                     SizedBox(
                       height: 50,
                       child: ElevatedButton(
-                        onPressed: authViewModel.isLoading ? null : () {
-                          if (_selectedRole == 'student') {
-                            _signupStudent(context);
-                          } else {
-                            _signupInstructor(context);
-                          }
-                        },
+                        onPressed:
+                            authViewModel.isLoading
+                                ? null
+                                : () {
+                                  if (_selectedRole == 'student') {
+                                    _signupStudent(context);
+                                  } else {
+                                    _signupInstructor(context);
+                                  }
+                                },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Theme.of(context).primaryColor,
                           foregroundColor: Colors.white,
                         ),
-                        child: authViewModel.isLoading
-                            ? const CircularProgressIndicator(color: Colors.white)
-                            : Text(
-                                _selectedRole == 'student'
-                                    ? 'Sign Up as Student'
-                                    : 'Sign Up as Instructor',
-                                style: const TextStyle(fontSize: 16),
-                              ),
+                        child:
+                            authViewModel.isLoading
+                                ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
+                                : Text(
+                                  _selectedRole == 'student'
+                                      ? 'Sign Up as Student'
+                                      : 'Sign Up as Instructor',
+                                  style: const TextStyle(fontSize: 16),
+                                ),
                       ),
                     ),
                   ],
@@ -459,7 +512,10 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.check_circle, color: Colors.green.shade700),
+                          Icon(
+                            Icons.check_circle,
+                            color: Colors.green.shade700,
+                          ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
@@ -502,4 +558,3 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 }
-                

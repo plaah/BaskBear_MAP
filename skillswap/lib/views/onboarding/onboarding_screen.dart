@@ -12,7 +12,11 @@ class OnboardingScreen extends StatelessWidget {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.blue, Colors.black],
+            colors: [
+              Color.fromRGBO(255, 255, 255, 1),
+              Color.from(alpha: 1, red: 0.141, green: 0.545, blue: 0.855),
+              Color.fromRGBO(0, 46, 80, 1),
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -41,7 +45,7 @@ class OnboardingScreen extends StatelessWidget {
                 const SizedBox(height: 40),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent,
+                    backgroundColor: const Color.fromRGBO(16, 83, 198, 1),
                     minimumSize: const Size(double.infinity, 50),
                   ),
                   onPressed: () {
@@ -62,7 +66,7 @@ class OnboardingScreen extends StatelessWidget {
                   },
                   child: const Text(
                     'Already have an account? Login',
-                    style: TextStyle(color: Colors.white70),
+                    style: TextStyle(color: Color.fromARGB(179, 255, 255, 255)),
                   ),
                 ),
                 const Spacer(),
