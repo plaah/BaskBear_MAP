@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../profile/instructor/instructor_profile_screen.dart';
+// Remove the import for instructor_profile_screen.dart if not available
 
 class InstructorHomeScreen extends StatelessWidget {
   const InstructorHomeScreen({super.key});
@@ -7,247 +7,203 @@ class InstructorHomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF10162A),
+      // Match student dashboard's gradient background
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color.fromARGB(255, 1, 76, 134),
-              Color.fromRGBO(0, 1, 39, 1),
-              Color.fromARGB(255, 2, 23, 49),
+              Color.fromARGB(255, 204, 204, 253),
+              Color.fromARGB(255, 252, 253, 255),
+              Color.fromARGB(255, 206, 239, 255),
             ],
-            stops: [0.0, 0.5, 1.0],
           ),
         ),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 18.0,
-                vertical: 16,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header with avatar, greeting, and actions
-                  Row(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.blueAccent,
-                            width: 2,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.blueAccent.withOpacity(0.25),
-                              blurRadius: 14,
-                              spreadRadius: 2,
-                            ),
-                          ],
-                        ),
-                        child: const CircleAvatar(
-                          radius: 28,
-                          backgroundColor: Color(0xFF1976D2),
-                          child: Icon(
-                            Icons.person,
-                            size: 34,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'SkillSwap',
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                letterSpacing: 1.2,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Welcome back, Instructor! 👋',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white.withOpacity(0.95),
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              'Manage your courses and students efficiently.',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.white.withOpacity(0.7),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.blueAccent.withOpacity(0.14),
-                          shape: BoxShape.circle,
-                        ),
-                        child: IconButton(
-                          icon: Icon(
-                            Icons.person,
-                            color: Colors.blueAccent.shade100,
-                            size: 28,
-                          ),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (context) =>
-                                        const InstructorProfileScreen(),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.blueAccent.withOpacity(0.14),
-                          shape: BoxShape.circle,
-                        ),
-                        child: IconButton(
-                          icon: Icon(
-                            Icons.add,
-                            color: Colors.blueAccent.shade100,
-                            size: 28,
-                          ),
-                          onPressed: () {
-                            // Add new course functionality
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 28),
-                  // Feature Cards Grid
-                  Text(
-                    'Features',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white.withOpacity(0.85),
+        child: CustomScrollView(
+          slivers: [
+            // App Bar with Instructor Info
+            SliverAppBar(
+              expandedHeight: 180,
+              floating: false,
+              pinned: true,
+              backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+              flexibleSpace: FlexibleSpaceBar(
+                background: Container(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color.fromARGB(255, 2, 56, 131),
+                        Color.fromARGB(255, 144, 156, 249),
+                        Color.fromARGB(255, 0, 10, 81),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  GridView.count(
-                    crossAxisCount: 2,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    mainAxisSpacing: 16,
-                    crossAxisSpacing: 16,
-                    childAspectRatio: 1.2,
-                    children: [
-                      _buildFeatureCard(
-                        icon: Icons.add_circle,
-                        title: 'Create Course',
-                        onTap: () {},
+                  child: SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.white.withOpacity(0.3),
+                                    width: 2,
+                                  ),
+                                ),
+                                child: const CircleAvatar(
+                                  radius: 22,
+                                  backgroundColor: Color(0xFF2196F3),
+                                  child: Icon(
+                                    Icons.person,
+                                    color: Colors.white,
+                                    size: 28,
+                                  ),
+                                ),
+                              ),
+                              const Spacer(),
+                              IconButton(
+                                icon: Badge(
+                                  smallSize: 8,
+                                  backgroundColor: Colors.amber,
+                                  child: const Icon(
+                                    Icons.notifications_outlined,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                onPressed: () {},
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          const Text(
+                            'Hello, Instructor 👋',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            'Manage your courses and students efficiently.',
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Colors.white70,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
-                      _buildFeatureCard(
-                        icon: Icons.library_books,
-                        title: 'My Courses',
-                        onTap: () {},
-                      ),
-                      _buildFeatureCard(
-                        icon: Icons.people,
-                        title: 'Students',
-                        onTap: () {},
-                      ),
-                      _buildFeatureCard(
-                        icon: Icons.analytics,
-                        title: 'Analytics',
-                        onTap: () {},
-                      ),
-                    ],
+                    ),
                   ),
-                  const SizedBox(height: 32),
-                  // (Optional) Add more instructor-specific widgets here
-                ],
+                ),
               ),
             ),
-          ),
-        ),
-      ),
-      // Floating Rounded Bottom Navigation Bar
-      bottomNavigationBar: Container(
-        height: 80,
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFF11131A), Color(0xFF1F4068)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(24),
-            topRight: Radius.circular(24),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.blueAccent.withOpacity(0.18),
-              blurRadius: 24,
-              spreadRadius: 2,
+            // Main Content
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Features Section
+                    const Text(
+                      'Features',
+                      style: TextStyle(
+                        fontSize: 19,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    GridView.count(
+                      crossAxisCount: 2,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      mainAxisSpacing: 16,
+                      crossAxisSpacing: 16,
+                      childAspectRatio: 1.2,
+                      children: [
+                        _buildFeatureCard(
+                          icon: Icons.add_circle,
+                          title: 'Create Course',
+                          onTap: () {},
+                        ),
+                        _buildFeatureCard(
+                          icon: Icons.library_books,
+                          title: 'My Courses',
+                          onTap: () {},
+                        ),
+                        _buildFeatureCard(
+                          icon: Icons.people,
+                          title: 'Students',
+                          onTap: () {},
+                        ),
+                        _buildFeatureCard(
+                          icon: Icons.analytics,
+                          title: 'Analytics',
+                          onTap: () {},
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 32),
+                    // Add more instructor-specific widgets here if needed
+                  ],
+                ),
+              ),
             ),
           ],
         ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                icon: const Icon(
-                  Icons.home_rounded,
-                  color: Colors.white,
-                  size: 28,
-                ),
-                onPressed: () {},
+      ),
+      // Bottom Navigation Bar (matches student dashboard)
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, -5),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          child: BottomNavigationBar(
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: Colors.white,
+            selectedItemColor: const Color(0xFF2196F3),
+            unselectedItemColor: Colors.grey.shade500,
+            showSelectedLabels: false,
+            showUnselectedLabels: false,
+            elevation: 0,
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home_filled),
+                label: 'Home',
               ),
-              IconButton(
-                icon: Icon(
-                  Icons.library_books,
-                  color: Colors.white.withOpacity(0.7),
-                  size: 26,
-                ),
-                onPressed: () {},
+              BottomNavigationBarItem(
+                icon: Icon(Icons.library_books),
+                label: 'Courses',
               ),
-              IconButton(
-                icon: Icon(
-                  Icons.analytics,
-                  color: Colors.white.withOpacity(0.7),
-                  size: 26,
-                ),
-                onPressed: () {},
+              BottomNavigationBarItem(
+                icon: Icon(Icons.analytics),
+                label: 'Analytics',
               ),
-              IconButton(
-                icon: Icon(
-                  Icons.person_rounded,
-                  color: Colors.white.withOpacity(0.7),
-                  size: 26,
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const InstructorProfileScreen(),
-                    ),
-                  );
-                },
+              BottomNavigationBarItem(
+                icon: Icon(Icons.person_outline),
+                label: 'Profile',
               ),
             ],
           ),
@@ -319,6 +275,43 @@ class InstructorHomeScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+// If you use Badge widget from student dashboard, you may need to import or define it.
+// If not available, replace Badge with a simple Icon widget.
+class Badge extends StatelessWidget {
+  final Widget child;
+  final double smallSize;
+  final Color backgroundColor;
+
+  const Badge({
+    super.key,
+    required this.child,
+    this.smallSize = 8,
+    this.backgroundColor = Colors.red,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      alignment: Alignment.topRight,
+      children: [
+        child,
+        Positioned(
+          right: 0,
+          top: 0,
+          child: Container(
+            width: smallSize,
+            height: smallSize,
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              shape: BoxShape.circle,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -175,10 +175,12 @@ class _SignupScreenState extends State<SignupScreen> {
                       border: OutlineInputBorder(),
                     ),
                     validator: (v) {
-                      if (v == null || v.trim().isEmpty)
+                      if (v == null || v.trim().isEmpty) {
                         return 'Full name is required';
-                      if (v.trim().length < 2)
+                      }
+                      if (v.trim().length < 2) {
                         return 'Name must be at least 2 characters';
+                      }
                       return null;
                     },
                   ),
@@ -193,8 +195,9 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                     keyboardType: TextInputType.emailAddress,
                     validator: (v) {
-                      if (v == null || v.trim().isEmpty)
+                      if (v == null || v.trim().isEmpty) {
                         return 'Email is required';
+                      }
                       if (!RegExp(
                         r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
                       ).hasMatch(v)) {
@@ -226,8 +229,9 @@ class _SignupScreenState extends State<SignupScreen> {
                     obscureText: !_passwordVisible,
                     validator: (v) {
                       if (v == null || v.isEmpty) return 'Password is required';
-                      if (v.length < 6)
+                      if (v.length < 6) {
                         return 'Password must be at least 6 characters';
+                      }
                       return null;
                     },
                   ),
@@ -241,8 +245,9 @@ class _SignupScreenState extends State<SignupScreen> {
                       border: OutlineInputBorder(),
                     ),
                     validator: (v) {
-                      if (v == null || v.trim().isEmpty)
+                      if (v == null || v.trim().isEmpty) {
                         return 'Location is required';
+                      }
                       return null;
                     },
                   ),
@@ -357,11 +362,13 @@ class _SignupScreenState extends State<SignupScreen> {
                       keyboardType: TextInputType.number,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       validator: (v) {
-                        if (v == null || v.isEmpty)
+                        if (v == null || v.isEmpty) {
                           return 'Experience is required';
+                        }
                         final years = int.tryParse(v);
-                        if (years == null || years < 0)
+                        if (years == null || years < 0) {
                           return 'Please enter valid years';
+                        }
                         return null;
                       },
                     ),
@@ -376,8 +383,9 @@ class _SignupScreenState extends State<SignupScreen> {
                         border: OutlineInputBorder(),
                       ),
                       validator: (v) {
-                        if (v == null || v.trim().isEmpty)
+                        if (v == null || v.trim().isEmpty) {
                           return 'Professional link is required';
+                        }
                         return null;
                       },
                     ),
@@ -394,10 +402,12 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                       maxLines: 3,
                       validator: (v) {
-                        if (v == null || v.trim().isEmpty)
+                        if (v == null || v.trim().isEmpty) {
                           return 'Description is required';
-                        if (v.trim().length < 20)
+                        }
+                        if (v.trim().length < 20) {
                           return 'Please provide more details (at least 20 characters)';
+                        }
                         return null;
                       },
                     ),

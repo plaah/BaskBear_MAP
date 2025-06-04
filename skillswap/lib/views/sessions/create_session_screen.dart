@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'browse_sessions_screen.dart'; // Import your target screen
 
 class CreateSessionPage extends StatefulWidget {
+  const CreateSessionPage({super.key});
+
   @override
   _CreateSessionPageState createState() => _CreateSessionPageState();
 }
@@ -67,7 +69,14 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
           key: _formKey,
           child: ListView(
             children: [
-              Text("Create Session", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.blue)),
+              Text(
+                "Create Session",
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue,
+                ),
+              ),
               SizedBox(height: 16),
               TextFormField(
                 controller: _sessionName,
@@ -89,9 +98,12 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                       child: AbsorbPointer(
                         child: TextFormField(
                           decoration: InputDecoration(
-                            hintText: _startDate == null
-                                ? 'Start Date'
-                                : _startDate!.toLocal().toString().split(' ')[0],
+                            hintText:
+                                _startDate == null
+                                    ? 'Start Date'
+                                    : _startDate!.toLocal().toString().split(
+                                      ' ',
+                                    )[0],
                           ),
                         ),
                       ),
@@ -104,9 +116,12 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                       child: AbsorbPointer(
                         child: TextFormField(
                           decoration: InputDecoration(
-                            hintText: _endDate == null
-                                ? 'End Date'
-                                : _endDate!.toLocal().toString().split(' ')[0],
+                            hintText:
+                                _endDate == null
+                                    ? 'End Date'
+                                    : _endDate!.toLocal().toString().split(
+                                      ' ',
+                                    )[0],
                           ),
                         ),
                       ),

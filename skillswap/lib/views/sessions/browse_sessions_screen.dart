@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
 class BrowseSessionScreen extends StatefulWidget {
-  const BrowseSessionScreen({super.key});
+  const BrowseSessionScreen({
+    super.key,
+    required Map<String, Object> newSession,
+  });
 
   @override
   State<BrowseSessionScreen> createState() => _BrowseSessionScreenState();
@@ -16,7 +19,7 @@ class _BrowseSessionScreenState extends State<BrowseSessionScreen> {
     'Development',
     'Business',
     'Marketing',
-    'Photography'
+    'Photography',
   ];
 
   final List<Map<String, dynamic>> _courses = [
@@ -27,7 +30,7 @@ class _BrowseSessionScreenState extends State<BrowseSessionScreen> {
       'rating': 4.8,
       'students': 1245,
       'image':
-      'https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=400&q=80',
+          'https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=400&q=80',
       'category': 'Design',
       'duration': '5h 20m',
     },
@@ -38,7 +41,7 @@ class _BrowseSessionScreenState extends State<BrowseSessionScreen> {
       'rating': 4.7,
       'students': 892,
       'image':
-      'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=400&q=80',
+          'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=400&q=80',
       'category': 'Development',
       'duration': '8h 15m',
     },
@@ -49,7 +52,7 @@ class _BrowseSessionScreenState extends State<BrowseSessionScreen> {
       'rating': 4.9,
       'students': 2103,
       'image':
-      'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=400&q=80',
+          'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=400&q=80',
       'category': 'Marketing',
       'duration': '6h 45m',
     },
@@ -60,7 +63,7 @@ class _BrowseSessionScreenState extends State<BrowseSessionScreen> {
       'rating': 4.6,
       'students': 756,
       'image':
-      'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=400&q=80',
+          'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=400&q=80',
       'category': 'Business',
       'duration': '7h 30m',
     },
@@ -71,7 +74,7 @@ class _BrowseSessionScreenState extends State<BrowseSessionScreen> {
       'rating': 4.5,
       'students': 543,
       'image':
-      'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=400&q=80',
+          'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=400&q=80',
       'category': 'Photography',
       'duration': '4h 10m',
     },
@@ -82,7 +85,7 @@ class _BrowseSessionScreenState extends State<BrowseSessionScreen> {
       'rating': 4.9,
       'students': 987,
       'image':
-      'https://images.unsplash.com/photo-1551650975-87deedd944c3?auto=format&fit=crop&w=400&q=80',
+          'https://images.unsplash.com/photo-1551650975-87deedd944c3?auto=format&fit=crop&w=400&q=80',
       'category': 'Design',
       'duration': '5h 50m',
     },
@@ -95,9 +98,9 @@ class _BrowseSessionScreenState extends State<BrowseSessionScreen> {
     return _courses.where((course) {
       final matchesCategory =
           _selectedCategory == 'All' || course['category'] == _selectedCategory;
-      final matchesSearch = course['title']
-          .toLowerCase()
-          .contains(_searchController.text.toLowerCase());
+      final matchesSearch = course['title'].toLowerCase().contains(
+        _searchController.text.toLowerCase(),
+      );
       return matchesCategory && matchesSearch;
     }).toList();
   }
@@ -180,9 +183,14 @@ class _BrowseSessionScreenState extends State<BrowseSessionScreen> {
                       decoration: InputDecoration(
                         hintText: 'Search courses...',
                         hintStyle: TextStyle(color: Colors.white70),
-                        prefixIcon: const Icon(Icons.search, color: Colors.white70),
+                        prefixIcon: const Icon(
+                          Icons.search,
+                          color: Colors.white70,
+                        ),
                         border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 18),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 18,
+                        ),
                         suffixIcon: IconButton(
                           icon: const Icon(Icons.tune, color: Colors.white70),
                           onPressed: () {},
@@ -249,7 +257,11 @@ class _BrowseSessionScreenState extends State<BrowseSessionScreen> {
                       ),
                       const Spacer(),
                       IconButton(
-                        icon: const Icon(Icons.filter_list, size: 22, color: Colors.white70),
+                        icon: const Icon(
+                          Icons.filter_list,
+                          size: 22,
+                          color: Colors.white70,
+                        ),
                         onPressed: () {},
                       ),
                     ],
@@ -340,7 +352,11 @@ class _BrowseSessionScreenState extends State<BrowseSessionScreen> {
                     const SizedBox(height: 10),
                     Row(
                       children: [
-                        Icon(Icons.star_rounded, color: Colors.amberAccent, size: 18),
+                        Icon(
+                          Icons.star_rounded,
+                          color: Colors.amberAccent,
+                          size: 18,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           course['rating'].toString(),
@@ -352,14 +368,14 @@ class _BrowseSessionScreenState extends State<BrowseSessionScreen> {
                         const SizedBox(width: 8),
                         Text(
                           '(${course['students']})',
-                          style: TextStyle(
-                            color: Colors.white60,
-                            fontSize: 12,
-                          ),
+                          style: TextStyle(color: Colors.white60, fontSize: 12),
                         ),
                         const Spacer(),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 5,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.blueAccent.withOpacity(0.18),
                             borderRadius: BorderRadius.circular(12),
@@ -382,14 +398,14 @@ class _BrowseSessionScreenState extends State<BrowseSessionScreen> {
                         const SizedBox(width: 4),
                         Text(
                           course['duration'],
-                          style: TextStyle(
-                            color: Colors.white54,
-                            fontSize: 12,
-                          ),
+                          style: TextStyle(color: Colors.white54, fontSize: 12),
                         ),
                         const Spacer(),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.10),
                             borderRadius: BorderRadius.circular(8),
