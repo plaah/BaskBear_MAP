@@ -1,26 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
-// Import your BrowseSessionScreen and StudentProfileScreen here
-import '../sessions/browse_sessions_screen.dart';
-import '../profile/student/student_profile_screen.dart';
+// Dummy navigation targets
+class BrowseSessionScreen extends StatelessWidget {
+  const BrowseSessionScreen({super.key});
+  @override
+  Widget build(BuildContext context) =>
+      Scaffold(appBar: AppBar(title: const Text('Browse Sessions')));
+}
+
+class StudentProfileScreen extends StatelessWidget {
+  const StudentProfileScreen({super.key});
+  @override
+  Widget build(BuildContext context) =>
+      Scaffold(appBar: AppBar(title: const Text('My Profile')));
+}
 
 class StudentDashboardScreen extends StatelessWidget {
   const StudentDashboardScreen({super.key});
 
-  // Fetch the user's full name from Firestore using their UID
-  Future<String?> getUserName() async {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid == null) return null;
-    final doc =
-        await FirebaseFirestore.instance.collection('users').doc(uid).get();
-    return doc.data()?['fullName'] as String?;
-  }
+  // Dummy user name
+  Future<String?> getUserName() async => Future.value("Esha");
 
   @override
   Widget build(BuildContext context) {
-    // Dummy course data
     final List<Map<String, String>> recommendedCourses = [
       {
         'title': 'UI Design Basics',
@@ -60,17 +62,18 @@ class StudentDashboardScreen extends StatelessWidget {
       },
     ];
 
-    const avatarUrl =
-        'https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
-
     return Scaffold(
-      backgroundColor: const Color(0xFF11131A),
+      backgroundColor: const Color(0xFF10162A),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF001950), Color(0xFF162447), Color(0xFF1F4068)],
+            colors: [
+              Color.fromARGB(255, 1, 76, 134),
+              Color.fromRGBO(0, 1, 39, 1),
+              Color.fromARGB(255, 2, 23, 49),
+            ],
             stops: [0.0, 0.5, 1.0],
           ),
         ),
@@ -96,16 +99,20 @@ class StudentDashboardScreen extends StatelessWidget {
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.blueAccent.withOpacity(0.35),
+                              color: Colors.blueAccent.withOpacity(0.25),
                               blurRadius: 14,
                               spreadRadius: 2,
                             ),
                           ],
                         ),
-                        child: CircleAvatar(
+                        child: const CircleAvatar(
                           radius: 28,
-                          backgroundColor: Colors.transparent,
-                          backgroundImage: NetworkImage(avatarUrl),
+                          backgroundColor: Color(0xFF1976D2),
+                          child: Icon(
+                            Icons.person,
+                            size: 34,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 14),
@@ -115,7 +122,7 @@ class StudentDashboardScreen extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-                                Text(
+                                const Text(
                                   'SkillSwap',
                                   style: TextStyle(
                                     fontSize: 22,
@@ -131,17 +138,6 @@ class StudentDashboardScreen extends StatelessWidget {
                             FutureBuilder<String?>(
                               future: getUserName(),
                               builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return const Text(
-                                    'Hi! 👋',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white,
-                                    ),
-                                  );
-                                }
                                 final name = snapshot.data ?? 'User';
                                 return Text(
                                   'Hi, $name! 👋',
@@ -166,7 +162,7 @@ class StudentDashboardScreen extends StatelessWidget {
                       ),
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.blueAccent.withOpacity(0.18),
+                          color: Colors.blueAccent.withOpacity(0.14),
                           shape: BoxShape.circle,
                         ),
                         child: IconButton(
@@ -184,7 +180,7 @@ class StudentDashboardScreen extends StatelessWidget {
                   // Search Bar
                   Container(
                     decoration: BoxDecoration(
-                      color: const Color(0xFF22263A),
+                      color: const Color.fromARGB(255, 255, 255, 255),
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
@@ -199,11 +195,18 @@ class StudentDashboardScreen extends StatelessWidget {
                       ),
                     ),
                     child: TextField(
-                      style: const TextStyle(color: Colors.white),
+                      style: const TextStyle(
+                        color: Color.fromRGBO(0, 58, 151, 1),
+                      ),
                       decoration: InputDecoration(
                         hintText: 'Search for courses, topics, or instructors',
                         hintStyle: TextStyle(
-                          color: Colors.white.withOpacity(0.35),
+                          color: const Color.fromARGB(
+                            255,
+                            0,
+                            69,
+                            219,
+                          ).withOpacity(0.35),
                         ),
                         prefixIcon: Icon(
                           Icons.search_rounded,
@@ -238,12 +241,6 @@ class StudentDashboardScreen extends StatelessWidget {
                       _buildFeatureCard(
                         icon: Icons.search_rounded,
                         title: 'Find Courses',
-                        color: Colors.blueAccent,
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF1A2980), Color(0xFF26D0CE)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
                         onTap: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
@@ -255,52 +252,22 @@ class StudentDashboardScreen extends StatelessWidget {
                       _buildFeatureCard(
                         icon: Icons.book_rounded,
                         title: 'My Courses',
-                        color: Colors.indigoAccent,
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF283E51), Color(0xFF485563)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
                       ),
                       _buildFeatureCard(
                         icon: Icons.assignment_turned_in_rounded,
                         title: 'Assignments',
-                        color: Colors.tealAccent,
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF134E5E), Color(0xFF71B280)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
                       ),
                       _buildFeatureCard(
                         icon: Icons.chat_bubble_rounded,
                         title: 'Messages',
-                        color: Colors.purpleAccent,
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF41295A), Color(0xFF2F0743)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
                       ),
                       _buildFeatureCard(
                         icon: Icons.star_rounded,
                         title: 'Achievements',
-                        color: Colors.amberAccent,
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFFFFB347), Color(0xFFFFCC33)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
                       ),
                       _buildFeatureCard(
                         icon: Icons.settings_rounded,
                         title: 'Settings',
-                        color: Colors.grey,
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF232526), Color(0xFF414345)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
                       ),
                     ],
                   ),
@@ -420,62 +387,68 @@ class StudentDashboardScreen extends StatelessWidget {
     );
   }
 
-  // Feature Card Builder
+  // Feature Card Builder (white/light gradient, dark text)
   static Widget _buildFeatureCard({
     required IconData icon,
     required String title,
-    required Color color,
-    required Gradient gradient,
     VoidCallback? onTap,
   }) {
+    const Color navyBlue = Color(0xFF1A237E);
+    const Color accentBlue = Color(0xFF1976D2);
+
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
-        gradient: gradient,
+        gradient: const LinearGradient(
+          colors: [
+            Color.fromARGB(255, 218, 240, 255),
+            Color.fromARGB(255, 203, 233, 253),
+
+            // very light blue
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.37),
-            blurRadius: 18,
-            offset: const Offset(0, 6),
+            color: Colors.black12,
+            blurRadius: 10,
+            offset: Offset(0, 4),
           ),
         ],
       ),
       child: Material(
         color: Colors.transparent,
+        borderRadius: BorderRadius.circular(18),
         child: InkWell(
           borderRadius: BorderRadius.circular(18),
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.07),
+                    color: accentBlue.withOpacity(0.12),
                     shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: color.withOpacity(0.25),
-                        blurRadius: 16,
-                        spreadRadius: 1,
-                      ),
-                    ],
                   ),
-                  padding: const EdgeInsets.all(10),
-                  child: Icon(icon, size: 22, color: Colors.white),
+                  padding: const EdgeInsets.all(12),
+                  child: Icon(
+                    icon,
+                    size: 28,
+                    color: const Color.fromARGB(255, 0, 34, 68),
+                  ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 Text(
                   title,
                   textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 13,
+                    color: navyBlue,
                     fontWeight: FontWeight.w600,
-                    letterSpacing: 0.2,
+                    fontSize: 13.5,
+                    letterSpacing: 0.1,
                   ),
                 ),
               ],
@@ -491,7 +464,7 @@ class StudentDashboardScreen extends StatelessWidget {
     return Container(
       width: 180,
       decoration: BoxDecoration(
-        color: const Color(0xFF23263A),
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
@@ -569,17 +542,32 @@ class StudentDashboardScreen extends StatelessWidget {
               ],
             ),
           ),
-          Padding(
+          // White box for course info
+          Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(18),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.06),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
             padding: const EdgeInsets.all(12.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   course['title']!,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
-                    color: Colors.white.withOpacity(0.92),
+                    color: Colors.black87,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -587,25 +575,18 @@ class StudentDashboardScreen extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   course['instructor']!,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.white.withOpacity(0.6),
-                  ),
+                  style: const TextStyle(fontSize: 13, color: Colors.black54),
                 ),
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    Icon(
-                      Icons.schedule,
-                      color: Colors.white.withOpacity(0.5),
-                      size: 16,
-                    ),
+                    const Icon(Icons.schedule, color: Colors.black38, size: 16),
                     const SizedBox(width: 4),
                     Text(
                       course['duration']!,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 13,
-                        color: Colors.white.withOpacity(0.6),
+                        color: Colors.black54,
                       ),
                     ),
                     const Spacer(),
@@ -622,7 +603,7 @@ class StudentDashboardScreen extends StatelessWidget {
                         course['level']!,
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.blueAccent.shade100,
+                          color: Colors.blueAccent.shade700,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
