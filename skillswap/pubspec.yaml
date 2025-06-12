@@ -12,72 +12,55 @@ dependencies:
     sdk: flutter
 
   # Firebase Services
-  firebase_core: ^2.24.1
-  firebase_auth: ^5.0.1
-  cloud_firestore: ^4.15.1
-  firebase_database: ^10.3.5
-  firebase_storage: ^11.3.5
-  firebase_ui_auth: ^1.4.0
-  firebase_ui_firestore: ^1.4.0
+  firebase_core: ^3.14.0
+  firebase_auth: ^5.6.0
+  cloud_firestore: ^5.6.9
+  firebase_database: ^11.3.7
+  firebase_storage: ^12.4.7
+  firebase_ui_auth: ^1.17.0
+  firebase_ui_firestore: ^1.7.2
 
   # State Management
   provider: ^6.1.5
-  flutter_riverpod: ^2.4.9
+  flutter_riverpod: ^2.6.1
 
   # UI & Animation
   flutter_svg: ^2.0.10+1
-  lottie: ^2.7.0
+  lottie: ^3.3.1
   shimmer: ^3.0.0
-  badges: ^3.0.2
-  cached_network_image: ^3.3.0
-  carousel_slider: ^4.2.1
+  badges: ^3.1.2
+  cached_network_image: ^3.4.1
+  carousel_slider: ^5.1.1
   flutter_staggered_grid_view: ^0.7.0
 
   # Forms & Input
   image_picker: ^1.0.4
-  file_picker: ^5.4.0
-  intl: ^0.18.1
-  url_launcher: ^6.1.11
+  file_picker: ^10.1.9
+  intl: ^0.20.2
+  url_launcher: ^6.3.1
 
   # Utilities
-  uuid: ^3.0.7
-  shared_preferences: ^2.2.2
-  equatable: ^2.0.5
-  flutter_dotenv: ^5.1.0
+  uuid: ^4.5.1
+  shared_preferences: ^2.5.3
+  equatable: ^2.0.7
+  flutter_dotenv: ^5.2.1
 
   # Icons
   cupertino_icons: ^1.0.5
-  line_icons: ^3.0.0
-  material_design_icons_flutter: ^6.5.9599
+  line_icons: ^2.0.3
+  material_design_icons_flutter: ^7.0.7296
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.1
-  mockito: ^5.4.2
-  build_runner: ^2.4.5
-  flutter_gen_runner: ^5.3.1
+  flutter_lints: ^6.0.0
+  mockito: ^5.4.6
+  build_runner: ^2.4.15
+  flutter_gen_runner: ^5.10.0
 
 flutter:
   uses-material-design: true
-  
-  assets:
-   - assets/
 
-  fonts:
-    - family: Inter
-      fonts:
-        - asset: assets/fonts/Inter-Regular.ttf
-        - asset: assets/fonts/Inter-Medium.ttf
-          weight: 500
-        - asset: assets/fonts/Inter-SemiBold.ttf
-          weight: 600
-        - asset: assets/fonts/Inter-Bold.ttf
-          weight: 700
-    - family: Poppins
-      fonts:
-        - asset: assets/fonts/Poppins-Regular.ttf
-        - asset: assets/fonts/Poppins-Medium.ttf
-          weight: 500
-        - asset: assets/fonts/Poppins-SemiBold.ttf
-          weight: 600
+  assets:
+    - assets/
+

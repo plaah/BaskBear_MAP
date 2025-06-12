@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-// Remove the import for instructor_profile_screen.dart if not available
+// Import your create_session_screen.dart file
+import 'package:skillswap/views/sessions/create_session_screen.dart';
 
 class InstructorHomeScreen extends StatelessWidget {
   const InstructorHomeScreen({super.key});
@@ -139,7 +140,14 @@ class InstructorHomeScreen extends StatelessWidget {
                         _buildFeatureCard(
                           icon: Icons.add_circle,
                           title: 'Create Course',
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CreateSessionPage(),
+                              ),
+                            );
+                          },
                         ),
                         _buildFeatureCard(
                           icon: Icons.library_books,
