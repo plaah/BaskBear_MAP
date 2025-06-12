@@ -1,6 +1,9 @@
 // ignore_for_file: unused_import
 
 import 'package:flutter/material.dart';
+// Import the profile and courses screens
+import 'package:skillswap/views/profile/student/student_profile_screen.dart';
+import 'package:skillswap/views/sessions/browse_sessions_screen.dart';
 
 class RedesignedSkillSwapApp extends StatelessWidget {
   const RedesignedSkillSwapApp({super.key});
@@ -21,10 +24,31 @@ class RedesignedSkillSwapApp extends StatelessWidget {
   }
 }
 
-class StudentDashboardScreen extends StatelessWidget {
+class StudentDashboardScreen extends StatefulWidget {
   const StudentDashboardScreen({super.key});
 
+  @override
+  State<StudentDashboardScreen> createState() => _StudentDashboardScreenState();
+}
+
+class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
+  int _selectedIndex = 0;
+
   Future<String?> getUserName() async => Future.value("Esha");
+
+  void _onItemTapped(int index) {
+    if (index == 3) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const StudentProfileScreen()),
+      );
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+      // Add navigation for other tabs if needed
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +86,6 @@ class StudentDashboardScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      // Gradient background
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -70,8 +93,8 @@ class StudentDashboardScreen extends StatelessWidget {
             end: Alignment.bottomRight,
             colors: [
               Color.fromARGB(255, 204, 204, 253),
-              Color.fromARGB(255, 252, 253, 255), // blue
-              Color.fromARGB(255, 206, 239, 255), // very light blue/white
+              Color.fromARGB(255, 252, 253, 255),
+              Color.fromARGB(255, 206, 239, 255),
             ],
           ),
         ),
@@ -105,21 +128,35 @@ class StudentDashboardScreen extends StatelessWidget {
                           const SizedBox(height: 16),
                           Row(
                             children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Colors.white.withOpacity(0.3),
-                                    width: 2,
+                              // Add left spacing to move profile icon away from the back button
+                              const SizedBox(width: 20),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) =>
+                                              const StudentProfileScreen(),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: Colors.white.withOpacity(0.3),
+                                      width: 2,
+                                    ),
                                   ),
-                                ),
-                                child: const CircleAvatar(
-                                  radius: 22,
-                                  backgroundColor: Color(0xFF2196F3),
-                                  child: Icon(
-                                    Icons.person,
-                                    color: Colors.white,
-                                    size: 28,
+                                  child: const CircleAvatar(
+                                    radius: 22,
+                                    backgroundColor: Color(0xFF2196F3),
+                                    child: Icon(
+                                      Icons.person,
+                                      color: Colors.white,
+                                      size: 28,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -251,28 +288,44 @@ class StudentDashboardScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF0F7FF),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.book, color: Color(0xFF2196F3), size: 40),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Text(
-                              'Track your enrolled courses, progress, and certificates here!',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: Colors.blueGrey[800],
-                                fontSize: 15,
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) =>
+                                    const BrowseSessionScreen(newSession: {}),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF0F7FF),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.book,
+                              color: Color(0xFF2196F3),
+                              size: 40,
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Text(
+                                'Track your enrolled courses, progress, and certificates here!',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.blueGrey[800],
+                                  fontSize: 15,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -416,6 +469,8 @@ class StudentDashboardScreen extends StatelessWidget {
             showSelectedLabels: false,
             showUnselectedLabels: false,
             elevation: 0,
+            currentIndex: _selectedIndex,
+            onTap: _onItemTapped,
             items: [
               BottomNavigationBarItem(
                 icon: Container(
@@ -498,7 +553,7 @@ class CourseCard extends StatelessWidget {
       onTap: () {},
       child: Container(
         width: 200,
-        height: 220, // <-- Set a fixed height large enough for your content
+        height: 220,
         margin: const EdgeInsets.only(bottom: 8),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -523,7 +578,7 @@ class CourseCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                     child: Image.network(
                       course['image'] as String,
-                      height: 100, // Reduce image height to fit
+                      height: 100,
                       width: double.infinity,
                       fit: BoxFit.cover,
                     ),
@@ -581,7 +636,7 @@ class CourseCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 8), // Reduce spacing
+              const SizedBox(height: 8),
               Text(
                 course['title'] as String,
                 style: const TextStyle(
@@ -592,7 +647,7 @@ class CourseCard extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 4), // Reduce spacing
+              const SizedBox(height: 4),
               Text(
                 course['instructor'] as String,
                 style: TextStyle(
@@ -601,7 +656,7 @@ class CourseCard extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(height: 4), // Reduce spacing
+              const SizedBox(height: 4),
               Row(
                 children: [
                   Icon(
@@ -635,7 +690,6 @@ class CourseCard extends StatelessWidget {
                   ),
                 ],
               ),
-              // If you still need more space, further reduce font sizes or paddings.
             ],
           ),
         ),
