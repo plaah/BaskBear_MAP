@@ -1,9 +1,35 @@
 import 'package:flutter/material.dart';
 // Import your create_session_screen.dart file
 import 'package:skillswap/views/sessions/create_session_screen.dart';
+// Import the instructor profile screen
+import 'package:skillswap/views/profile/instructor/instructor_profile_screen.dart';
 
-class InstructorHomeScreen extends StatelessWidget {
+class InstructorHomeScreen extends StatefulWidget {
   const InstructorHomeScreen({super.key});
+
+  @override
+  State<InstructorHomeScreen> createState() => _InstructorHomeScreenState();
+}
+
+class _InstructorHomeScreenState extends State<InstructorHomeScreen> {
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    if (index == 3) {
+      // Profile icon tapped
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const InstructorProfileScreen(),
+        ),
+      );
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+      // Add navigation for other tabs if needed
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,21 +77,36 @@ class InstructorHomeScreen extends StatelessWidget {
                           const SizedBox(height: 16),
                           Row(
                             children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Colors.white.withOpacity(0.3),
-                                    width: 2,
+                              // Add left spacing to move profile icon away from the edge
+                              const SizedBox(width: 12),
+                              // Make profile icon tappable
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) =>
+                                              const InstructorProfileScreen(),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: Colors.white.withOpacity(0.3),
+                                      width: 2,
+                                    ),
                                   ),
-                                ),
-                                child: const CircleAvatar(
-                                  radius: 22,
-                                  backgroundColor: Color(0xFF2196F3),
-                                  child: Icon(
-                                    Icons.person,
-                                    color: Colors.white,
-                                    size: 28,
+                                  child: const CircleAvatar(
+                                    radius: 22,
+                                    backgroundColor: Color(0xFF2196F3),
+                                    child: Icon(
+                                      Icons.person,
+                                      color: Colors.white,
+                                      size: 28,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -113,8 +154,8 @@ class InstructorHomeScreen extends StatelessWidget {
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 16,
+                  horizontal: 32, // Increased from 24
+                  vertical: 24, // Increased from 16
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -196,6 +237,8 @@ class InstructorHomeScreen extends StatelessWidget {
             showSelectedLabels: false,
             showUnselectedLabels: false,
             elevation: 0,
+            currentIndex: _selectedIndex,
+            onTap: _onItemTapped,
             items: const [
               BottomNavigationBarItem(
                 icon: Icon(Icons.home_filled),

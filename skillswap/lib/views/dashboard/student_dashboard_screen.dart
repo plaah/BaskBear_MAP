@@ -113,8 +113,8 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        Color.fromARGB(255, 0, 14, 34),
-                        Color.fromARGB(255, 144, 156, 249),
+                        Color.fromARGB(255, 0, 51, 77),
+                        Color.fromARGB(255, 59, 148, 238),
                         Color.fromARGB(255, 0, 10, 81),
                       ],
                     ),
