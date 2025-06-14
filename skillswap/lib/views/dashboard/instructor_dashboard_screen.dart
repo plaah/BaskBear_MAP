@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
-// Import your create_session_screen.dart file
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:skillswap/views/sessions/create_session_screen.dart';
-// Import the instructor profile screen
 import 'package:skillswap/views/profile/instructor/instructor_profile_screen.dart';
+import 'package:skillswap/views/auth/login_screen.dart';
+import 'package:skillswap/views/timetable/timetable_screen.dart';
+import 'package:skillswap/views/notifications/notification_screen.dart';
+import 'package:skillswap/firebase_options.dart'; // Import the provided Firebase options
 
 class InstructorHomeScreen extends StatefulWidget {
   const InstructorHomeScreen({super.key});
@@ -13,10 +17,32 @@ class InstructorHomeScreen extends StatefulWidget {
 
 class _InstructorHomeScreenState extends State<InstructorHomeScreen> {
   int _selectedIndex = 0;
+  String _instructorName =
+      'Instructor'; // Default name until fetched from Firebase
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeFirebaseAndFetchUser();
+  }
+
+  // Initialize Firebase and fetch user data
+  Future<void> _initializeFirebaseAndFetchUser() async {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    final User? user = FirebaseAuth.instance.currentUser;
+    if (user != null &&
+        user.displayName != null &&
+        user.displayName!.isNotEmpty) {
+      setState(() {
+        _instructorName = user.displayName!;
+      });
+    }
+  }
 
   void _onItemTapped(int index) {
     if (index == 3) {
-      // Profile icon tapped
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -27,34 +53,84 @@ class _InstructorHomeScreenState extends State<InstructorHomeScreen> {
       setState(() {
         _selectedIndex = index;
       });
-      // Add navigation for other tabs if needed
     }
+  }
+
+  void _logout(BuildContext context) {
+    // Show styled confirmation dialog before logout
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          elevation: 5,
+          title: const Text(
+            'Confirm Logout',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF1A237E),
+            ),
+          ),
+          content: const Text(
+            'Are you sure you want to logout?',
+            style: TextStyle(color: Colors.black87),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('No', style: TextStyle(color: Colors.grey)),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: const Text(
+                'Yes, Logout',
+                style: TextStyle(
+                  color: Color(0xFF1976D2),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                // Navigate to LoginScreen and clear the navigation stack
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                  (Route<dynamic> route) => false,
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Match student dashboard's gradient background
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color.fromARGB(255, 204, 204, 253),
-              Color.fromARGB(255, 252, 253, 255),
-              Color.fromARGB(255, 206, 239, 255),
+              Color(0xFFE3F2FD), // Light Blue for a calming base
+              Color(0xFFF5F5F5), // Neutral White for balance
+              Color(0xFFE1F5FE), // Soft Sky Blue for a cohesive gradient
             ],
           ),
         ),
         child: CustomScrollView(
           slivers: [
-            // App Bar with Instructor Info
             SliverAppBar(
               expandedHeight: 180,
               floating: false,
               pinned: true,
-              backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+              backgroundColor: Colors.white,
+              automaticallyImplyLeading: false, // Removes the back button
               flexibleSpace: FlexibleSpaceBar(
                 background: Container(
                   decoration: const BoxDecoration(
@@ -62,24 +138,30 @@ class _InstructorHomeScreenState extends State<InstructorHomeScreen> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        Color.fromARGB(255, 2, 56, 131),
-                        Color.fromARGB(255, 144, 156, 249),
-                        Color.fromARGB(255, 0, 10, 81),
+                        Color.fromARGB(
+                          227,
+                          21,
+                          101,
+                          192,
+                        ), // Deep Blue for primary branding
+                        Color.fromARGB(171, 21, 101, 192),
+                        Color.fromARGB(171, 21, 101, 192),
                       ],
+                    ),
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(20),
+                      bottomRight: Radius.circular(20),
                     ),
                   ),
                   child: SafeArea(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const SizedBox(height: 16),
                           Row(
                             children: [
-                              // Add left spacing to move profile icon away from the edge
-                              const SizedBox(width: 12),
-                              // Make profile icon tappable
                               GestureDetector(
                                 onTap: () {
                                   Navigator.push(
@@ -95,50 +177,72 @@ class _InstructorHomeScreenState extends State<InstructorHomeScreen> {
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     border: Border.all(
-                                      color: Colors.white.withOpacity(0.3),
-                                      width: 2,
+                                      color: Colors.white.withOpacity(0.5),
+                                      width: 2.5,
                                     ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.2),
+                                        blurRadius: 6,
+                                        offset: const Offset(0, 3),
+                                      ),
+                                    ],
                                   ),
                                   child: const CircleAvatar(
-                                    radius: 22,
-                                    backgroundColor: Color(0xFF2196F3),
+                                    radius: 24,
+                                    backgroundColor: Color(0xFF42A5F5),
                                     child: Icon(
                                       Icons.person,
                                       color: Colors.white,
-                                      size: 28,
+                                      size: 30,
                                     ),
                                   ),
                                 ),
                               ),
                               const Spacer(),
                               IconButton(
-                                icon: Badge(
-                                  smallSize: 8,
-                                  backgroundColor: Colors.amber,
-                                  child: const Icon(
-                                    Icons.notifications_outlined,
-                                    color: Colors.white,
-                                  ),
+                                icon: const Icon(
+                                  Icons.notifications,
+                                  color: Colors.white,
+                                  size: 26,
                                 ),
-                                onPressed: () {},
+                                tooltip: 'Notifications',
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) => NotificationScreen(),
+                                    ),
+                                  );
+                                },
+                              ),
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.exit_to_app,
+                                  color: Colors.white,
+                                  size: 26,
+                                ),
+                                tooltip: 'Logout',
+                                onPressed: () => _logout(context),
                               ),
                             ],
                           ),
                           const SizedBox(height: 16),
-                          const Text(
-                            'Hello, Instructor 👋',
-                            style: TextStyle(
-                              fontSize: 24,
+                          Text(
+                            'Hello, $_instructorName 👋',
+                            style: const TextStyle(
+                              fontSize: 26,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                               letterSpacing: 0.5,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 6),
                           const Text(
                             'Manage your courses and students efficiently.',
                             style: TextStyle(
-                              fontSize: 15,
+                              fontSize: 16,
                               color: Colors.white70,
                               fontWeight: FontWeight.w500,
                             ),
@@ -150,23 +254,21 @@ class _InstructorHomeScreenState extends State<InstructorHomeScreen> {
                 ),
               ),
             ),
-            // Main Content
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 32, // Increased from 24
-                  vertical: 24, // Increased from 16
+                  horizontal: 20,
+                  vertical: 24,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Features Section
                     const Text(
                       'Features',
                       style: TextStyle(
-                        fontSize: 19,
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                        color: Color(0xFF1A237E),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -181,6 +283,10 @@ class _InstructorHomeScreenState extends State<InstructorHomeScreen> {
                         _buildFeatureCard(
                           icon: Icons.add_circle,
                           title: 'Create Course',
+                          iconColor: const Color(0xFF1976D2), // Bright Blue
+                          backgroundGradient: const LinearGradient(
+                            colors: [Color(0xFFE3F2FD), Color(0xFFBBDEFB)],
+                          ),
                           onTap: () {
                             Navigator.push(
                               context,
@@ -193,22 +299,49 @@ class _InstructorHomeScreenState extends State<InstructorHomeScreen> {
                         _buildFeatureCard(
                           icon: Icons.library_books,
                           title: 'My Courses',
+                          iconColor: const Color(0xFF388E3C), // Deep Green
+                          backgroundGradient: const LinearGradient(
+                            colors: [Color(0xFFE8F5E9), Color(0xFFC8E6C9)],
+                          ),
                           onTap: () {},
                         ),
                         _buildFeatureCard(
                           icon: Icons.people,
                           title: 'Students',
+                          iconColor: const Color(0xFFF57C00), // Warm Orange
+                          backgroundGradient: const LinearGradient(
+                            colors: [Color(0xFFFFF3E0), Color(0xFFFFE0B2)],
+                          ),
                           onTap: () {},
                         ),
                         _buildFeatureCard(
                           icon: Icons.analytics,
                           title: 'Analytics',
+                          iconColor: const Color(0xFF7C4DFF), // Vibrant Purple
+                          backgroundGradient: const LinearGradient(
+                            colors: [Color(0xFFF3E5F5), Color(0xFFE1BEE7)],
+                          ),
                           onTap: () {},
+                        ),
+                        _buildFeatureCard(
+                          icon: Icons.calendar_today,
+                          title: 'Timetable',
+                          iconColor: const Color(0xFFD32F2F), // Bold Red
+                          backgroundGradient: const LinearGradient(
+                            colors: [Color(0xFFFFEBEE), Color(0xFFFFCDD2)],
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => TimetableScreen(),
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),
                     const SizedBox(height: 32),
-                    // Add more instructor-specific widgets here if needed
                   ],
                 ),
               ),
@@ -216,14 +349,13 @@ class _InstructorHomeScreenState extends State<InstructorHomeScreen> {
           ],
         ),
       ),
-      // Bottom Navigation Bar (matches student dashboard)
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, -5),
+              color: Colors.grey.withOpacity(0.2),
+              blurRadius: 12,
+              offset: const Offset(0, -6),
             ),
           ],
         ),
@@ -232,7 +364,9 @@ class _InstructorHomeScreenState extends State<InstructorHomeScreen> {
           child: BottomNavigationBar(
             type: BottomNavigationBarType.fixed,
             backgroundColor: Colors.white,
-            selectedItemColor: const Color(0xFF2196F3),
+            selectedItemColor: const Color(
+              0xFF1565C0,
+            ), // Deep Blue for consistency
             unselectedItemColor: Colors.grey.shade500,
             showSelectedLabels: false,
             showUnselectedLabels: false,
@@ -263,62 +397,54 @@ class _InstructorHomeScreenState extends State<InstructorHomeScreen> {
     );
   }
 
-  // Modern Feature Card (matches student dashboard)
   static Widget _buildFeatureCard({
     required IconData icon,
     required String title,
+    required Color iconColor,
+    required LinearGradient backgroundGradient,
     VoidCallback? onTap,
   }) {
-    const Color navyBlue = Color(0xFF1A237E);
-    const Color accentBlue = Color(0xFF1976D2);
-
+    const Color textColor = Color(0xFF1A237E);
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18),
-        gradient: const LinearGradient(
-          colors: [
-            Color.fromARGB(255, 218, 240, 255),
-            Color.fromARGB(255, 203, 233, 253),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        borderRadius: BorderRadius.circular(16),
+        gradient: backgroundGradient,
         boxShadow: [
           BoxShadow(
-            color: Colors.black12,
-            blurRadius: 10,
-            offset: Offset(0, 4),
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(16),
         child: InkWell(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(16),
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    color: accentBlue.withOpacity(0.12),
+                    color: iconColor.withOpacity(0.15),
                     shape: BoxShape.circle,
                   ),
-                  padding: const EdgeInsets.all(12),
-                  child: Icon(icon, size: 28, color: navyBlue),
+                  padding: const EdgeInsets.all(14),
+                  child: Icon(icon, size: 30, color: iconColor),
                 ),
                 const SizedBox(height: 12),
                 Text(
                   title,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    color: navyBlue,
+                    color: textColor,
                     fontWeight: FontWeight.w600,
-                    fontSize: 13.5,
-                    letterSpacing: 0.1,
+                    fontSize: 14,
+                    letterSpacing: 0.2,
                   ),
                 ),
               ],
@@ -326,43 +452,6 @@ class _InstructorHomeScreenState extends State<InstructorHomeScreen> {
           ),
         ),
       ),
-    );
-  }
-}
-
-// If you use Badge widget from student dashboard, you may need to import or define it.
-// If not available, replace Badge with a simple Icon widget.
-class Badge extends StatelessWidget {
-  final Widget child;
-  final double smallSize;
-  final Color backgroundColor;
-
-  const Badge({
-    super.key,
-    required this.child,
-    this.smallSize = 8,
-    this.backgroundColor = Colors.red,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      alignment: Alignment.topRight,
-      children: [
-        child,
-        Positioned(
-          right: 0,
-          top: 0,
-          child: Container(
-            width: smallSize,
-            height: smallSize,
-            decoration: BoxDecoration(
-              color: backgroundColor,
-              shape: BoxShape.circle,
-            ),
-          ),
-        ),
-      ],
     );
   }
 }
