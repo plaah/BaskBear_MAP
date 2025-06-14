@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:skillswap/views/sessions/create_session_screen.dart';
 // Import the instructor profile screen
 import 'package:skillswap/views/profile/instructor/instructor_profile_screen.dart';
+import 'package:skillswap/views/sessions/session_list_screen.dart';
 
 class InstructorHomeScreen extends StatefulWidget {
   const InstructorHomeScreen({super.key});
@@ -185,7 +186,7 @@ class _InstructorHomeScreenState extends State<InstructorHomeScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => CreateSessionPage(),
+                                builder: (context) => CreateCoursePage(),
                               ),
                             );
                           },
@@ -193,7 +194,14 @@ class _InstructorHomeScreenState extends State<InstructorHomeScreen> {
                         _buildFeatureCard(
                           icon: Icons.library_books,
                           title: 'My Courses',
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const SessionListScreen(),
+                              ),
+                            );
+                          },
                         ),
                         _buildFeatureCard(
                           icon: Icons.people,

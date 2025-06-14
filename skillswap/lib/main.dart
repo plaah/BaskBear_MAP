@@ -3,7 +3,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:skillswap/views/onboarding/splash_screen.dart';
 import 'package:skillswap/viewmodels/auth_view_model.dart';
+import 'package:skillswap/viewmodels/session_view_model.dart'; 
 import 'package:skillswap/services/auth_service.dart';
+import 'package:skillswap/services/session_service.dart'; 
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -17,8 +19,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => AuthViewModel(AuthService()),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => AuthViewModel(AuthService()),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => SessionViewModel(SessionMockService()),
+        ),
+      ],
       child: MaterialApp(
         title: 'SkillSwap',
         theme: ThemeData.dark().copyWith(
@@ -29,7 +38,7 @@ class MyApp extends StatelessWidget {
             backgroundColor: Colors.transparent,
           ),
         ),
-        home: const SplashScreen(), // SplashScreen is now the entry point
+        home: const SplashScreen(),
         debugShowCheckedModeBanner: false,
       ),
     );
