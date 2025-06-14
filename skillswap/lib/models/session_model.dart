@@ -1,4 +1,5 @@
 class Session {
+  final String id; 
   final String title;
   final String instructor;
   final String description;
@@ -14,6 +15,7 @@ class Session {
   final bool isBooked;
 
   Session({
+    required this.id,
     required this.title,
     this.instructor = 'You',
     required this.description,
@@ -30,6 +32,26 @@ class Session {
   });
 
   String get durationHour => '$durationHours ${durationHours == 1 ? 'hour' : 'hours'}';
+
+  // Add this method
+  factory Session.fromMap(Map<String, dynamic> map, String id) {
+    return Session(
+      id: id,
+      title: map['title'] ?? '',
+      instructor: map['instructor'] ?? 'You',
+      description: map['description'] ?? '',
+      category: map['category'] ?? '',
+      isOnline: map['isOnline'] ?? false,
+      location: map['location'],
+      price: (map['price'] ?? 0.0).toDouble(),
+      startDate: DateTime.parse(map['startDate']),
+      endDate: map['endDate'] != null ? DateTime.parse(map['endDate']) : null,
+      rating: (map['rating'] ?? 0.0).toDouble(),
+      image: map['image'] ?? 'https://via.placeholder.com/150',
+      durationHours: map['durationHours'] ?? 0,
+      isBooked: map['isBooked'] ?? false,
+    );
+  }
 
   Map<String, dynamic> toMap() {
     return {

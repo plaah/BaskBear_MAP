@@ -50,6 +50,7 @@ class SessionViewModel extends ChangeNotifier {
       notifyListeners();
 
       final newSession = Session(
+        id: '', // Temporary placeholder (Firestore will generate ID)
         title: title,
         description: description,
         category: category,
@@ -63,7 +64,7 @@ class SessionViewModel extends ChangeNotifier {
       );
 
       await _sessionService.createSession(newSession);
-      await loadSessions();
+      await loadSessions(); // Reload to get Firestore-generated ID
     } catch (e) {
       _error = 'Create session failed: ${e.toString()}';
       debugPrint(_error);
@@ -93,10 +94,13 @@ class SessionViewModel extends ChangeNotifier {
   Future<void> deleteSession(String sessionId) async {
     try {
       await _sessionService.deleteSession(sessionId);
-      await loadSessions();
+      // Remove from local list immediately for better UX
+      _sessions.removeWhere((session) => session.id == sessionId);
+      notifyListeners();
     } catch (e) {
       _error = 'Delete session failed: ${e.toString()}';
       debugPrint(_error);
+      rethrow;
     }
   }
 
