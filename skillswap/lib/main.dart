@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
           create: (_) => AuthViewModel(AuthService()),
         ),
         ChangeNotifierProvider(
-          create: (_) => SessionViewModel(FirestoreSessionService()),
+          create: (_) => SessionViewModel(SessionMockService()),
         ),
       ],
       child: MaterialApp(
