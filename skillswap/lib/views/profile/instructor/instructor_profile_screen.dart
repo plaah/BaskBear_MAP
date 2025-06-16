@@ -4,12 +4,27 @@ import 'package:provider/provider.dart';
 import 'package:skillswap/models/instructor_model.dart';
 import 'package:skillswap/viewmodels/instructor_view_model.dart';
 
-class InstructorProfileScreen extends StatelessWidget {
+class InstructorProfileScreen extends StatefulWidget {
   const InstructorProfileScreen({super.key});
+
+  @override
+  State<InstructorProfileScreen> createState() => _InstructorProfileScreenState();
+}
+
+class _InstructorProfileScreenState extends State<InstructorProfileScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Fetch instructor data saat screen pertama kali muncul
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<InstructorViewModel>(context, listen: false).fetchInstructorProfile();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final instructorViewModel = Provider.of<InstructorViewModel>(context);
+    final instructor = instructorViewModel.instructor;
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -25,60 +40,50 @@ class InstructorProfileScreen extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: FutureBuilder<InstructorModel?>(
-        future: instructorViewModel.getInstructorProfile('some-uid'), // Replace with actual UID
-        builder: (context, snapshot) {
-          final instructor = snapshot.data;
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
-          if (instructor == null) {
-            return const Center(child: Text('Profile not found'));
-          }
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                CircleAvatar(
-                  radius: 50,
-                  backgroundImage: AssetImage('assets/instructor.jpeg'),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  instructor.fullName,
-                  style: TextStyle(
-                    fontSize: 24,
-                    color: Colors.blueAccent,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  'Senior Software Engineer',
-                  style: TextStyle(fontSize: 16, color: Colors.white70),
-                ),
-                const SizedBox(height: 30),
-                _buildProfileItem(Icons.email, instructor.email),
-                _buildProfileItem(Icons.phone, '+1 (987) 654-3210'),
-                _buildProfileItem(Icons.work, '${instructor.yearsExperience}+ years experience'),
-                const Spacer(),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent,
-                    minimumSize: const Size(double.infinity, 50),
-                  ),
-                  onPressed: () {
-                    _showEditProfileDialog(context, instructorViewModel, instructor);
-                  },
-                  child: const Text('Edit Profile', style: TextStyle(fontSize: 18)),
-                ),
-              ],
+      body: instructor == null
+          ? const Center(child: CircularProgressIndicator())
+          : Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            CircleAvatar(
+              radius: 50,
+              backgroundImage: instructor.profileImage != null
+                  ? NetworkImage(instructor.profileImage!)
+                  : const AssetImage('assets/instructor.jpeg') as ImageProvider,
             ),
-          );
-        },
+            const SizedBox(height: 20),
+            Text(
+              instructor.fullName,
+              style: const TextStyle(
+                fontSize: 24,
+                color: Colors.blueAccent,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'Senior Software Engineer',
+              style: TextStyle(fontSize: 16, color: Colors.white70),
+            ),
+            const SizedBox(height: 30),
+            _buildProfileItem(Icons.email, instructor.email),
+            _buildProfileItem(Icons.location_on, instructor.location),
+            _buildProfileItem(
+                Icons.work, '${instructor.yearsExperience ?? 0}+ years experience'),
+            const Spacer(),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueAccent,
+                minimumSize: const Size(double.infinity, 50),
+              ),
+              onPressed: () {
+                _showEditProfileDialog(context, instructorViewModel, instructor);
+              },
+              child: const Text('Edit Profile', style: TextStyle(fontSize: 18)),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -96,11 +101,13 @@ class InstructorProfileScreen extends StatelessWidget {
     );
   }
 
-  void _showEditProfileDialog(BuildContext context, InstructorViewModel instructorViewModel, InstructorModel instructor) {
+  void _showEditProfileDialog(
+      BuildContext context, InstructorViewModel instructorViewModel, InstructorModel instructor) {
     final TextEditingController fullNameController = TextEditingController(text: instructor.fullName);
     final TextEditingController emailController = TextEditingController(text: instructor.email);
     final TextEditingController locationController = TextEditingController(text: instructor.location);
-    final TextEditingController yearsExperienceController = TextEditingController(text: instructor.yearsExperience.toString());
+    final TextEditingController yearsExperienceController =
+    TextEditingController(text: instructor.yearsExperience?.toString() ?? '');
 
     showDialog(
       context: context,
@@ -132,9 +139,7 @@ class InstructorProfileScreen extends StatelessWidget {
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
+              onPressed: () => Navigator.pop(context),
               child: const Text('Cancel'),
             ),
             TextButton(
@@ -144,8 +149,15 @@ class InstructorProfileScreen extends StatelessWidget {
                   email: emailController.text,
                   fullName: fullNameController.text,
                   location: locationController.text,
+                  profileImage: instructor.profileImage,
+                  skills: instructor.skills,
+                  certifications: instructor.certifications,
+                  workLink: instructor.workLink,
+                  description: instructor.description,
+                  isApproved: instructor.isApproved,
                   yearsExperience: int.tryParse(yearsExperienceController.text),
                 );
+
                 instructorViewModel.updateInstructorProfile(updatedInstructor);
                 Navigator.pop(context);
               },

@@ -4,10 +4,11 @@ import 'firebase_options.dart';
 import 'package:skillswap/views/onboarding/splash_screen.dart';
 import 'package:skillswap/viewmodels/auth_view_model.dart';
 import 'package:skillswap/viewmodels/session_view_model.dart';
+import 'package:skillswap/viewmodels/instructor_view_model.dart';
+import 'package:skillswap/viewmodels/student_view_model.dart'; // ✅ Import StudentViewModel
 import 'package:skillswap/services/auth_service.dart';
 import 'package:skillswap/services/session_service.dart';
 import 'package:provider/provider.dart';
-import 'package:skillswap/viewmodels/instructor_view_model.dart'; // Import InstructorViewModel
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,8 +29,11 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => SessionViewModel(FirestoreSessionService()),
         ),
-        ChangeNotifierProvider( // Tambahkan provider untuk InstructorViewModel
+        ChangeNotifierProvider(
           create: (_) => InstructorViewModel(),
+        ),
+        ChangeNotifierProvider( // ✅ Tambahkan provider untuk StudentViewModel
+          create: (_) => StudentViewModel(),
         ),
       ],
       child: MaterialApp(
