@@ -33,7 +33,14 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (result != null && context.mounted) {
+        // Extract user data from the AuthViewModel result
         final userType = result['userType'] as String;
+        final user = result['user']; // Firebase User object
+        final userData = result['userData'] as Map<String, dynamic>;
+        
+        // Get the required parameters for StudentDashboardScreen
+        final userId = user.uid;                        // Firebase Auth UID
+        final userName = userData['fullName'] as String; // User's full name
         
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -44,10 +51,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
         // Navigate based on user type using pushReplacement to prevent going back
         if (userType == 'student') {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const StudentDashboardScreen()),
-          );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => StudentDashboardScreen(
+              studentId: userId,     // Pass the Firebase Auth UID
+              studentName: userName, // Pass the user's full name
+            ),
+          ),
+        );
         } else if (userType == 'instructor') {
           Navigator.pushReplacement(
             context,
