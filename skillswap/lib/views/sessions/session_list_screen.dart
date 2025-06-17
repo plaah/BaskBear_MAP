@@ -87,15 +87,7 @@ class _SessionListScreenState extends State<SessionListScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  'Booking Status: ${session.isBooked ? 'Booked' : 'Not booked'}',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: session.isBooked ? Colors.green[800] : Colors.grey[600],
-                  ),
-                ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 2),                
                 Row(
                   children: [
                     Icon(Icons.category, size: 14, color: Colors.grey[600]),
@@ -394,63 +386,7 @@ class _SessionListScreenState extends State<SessionListScreen> {
                           ),
                         if (!isOnline) const SizedBox(height: 24),
 
-                        // Booking Status Section
-                        _buildSectionTitle('Booking Status'),
-                        const SizedBox(height: 16),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF2D2D2D),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: const Color(0xFF404040)),
-                          ),
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Row(
-                                  children: [
-                                    Radio<bool>(
-                                      value: true,
-                                      groupValue: isBooked,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          isBooked = value!;
-                                        });
-                                      },
-                                      activeColor: Colors.green,
-                                    ),
-                                    const Text(
-                                      'Booked',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Expanded(
-                                child: Row(
-                                  children: [
-                                    Radio<bool>(
-                                      value: false,
-                                      groupValue: isBooked,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          isBooked = value!;
-                                        });
-                                      },
-                                      activeColor: Colors.grey,
-                                    ),
-                                    const Text(
-                                      'Not Booked',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-
+                       
                         // Schedule Section
                         _buildSectionTitle('Schedule'),
                         const SizedBox(height: 16),
@@ -617,17 +553,22 @@ class _SessionListScreenState extends State<SessionListScreen> {
                                     final updatedSession = Session(
                                       id: session.id,
                                       title: titleController.text,
+                                      instructor: session.instructor, // or provide a controller if editable
+                                      instructorId: session.instructorId, // required
                                       description: descriptionController.text,
                                       category: selectedCategory,
-                                      price: double.parse(priceController.text),
-                                      durationHours: int.parse(durationController.text),
                                       isOnline: isOnline,
-                                      image: session.image,
-                                      startDate: startDate!, // Now guaranteed to be non-null
-                                      endDate: endDate, // This can be null
                                       location: isOnline ? null : locationController.text,
+                                      //meetingUrl: isOnline ? meetingUrlController.text : null, // add this if you have a controller
+                                      price: double.parse(priceController.text),
+                                      startDate: startDate!,
+                                      endDate: endDate,
+                                      rating: session.rating, // or provide a controller if editable
+                                      image: session.image,
+                                      durationHours: int.parse(durationController.text),
                                       isBooked: isBooked,
                                     );
+
 
                                     vm.updateSession(updatedSession);
 
