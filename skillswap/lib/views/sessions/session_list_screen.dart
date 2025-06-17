@@ -35,7 +35,6 @@ class _SessionListScreenState extends State<SessionListScreen> {
             return _buildEmptyState();
           }
 
-
           return ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: viewModel.sessions.length,
@@ -60,8 +59,24 @@ class _SessionListScreenState extends State<SessionListScreen> {
           // Header with action buttons
           ListTile(
             leading: session.image.startsWith('http')
-                ? Image.network(session.image, width: 60, height: 60)
-                : Image.file(File(session.image), width: 60, height: 60),
+                ? Image.network(
+              session.image,
+              width: 60,
+              height: 60,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) =>
+              const Icon(Icons.image_not_supported, size: 60),
+            )
+                : session.image.isNotEmpty
+                ? Image.file(
+              File(session.image),
+              width: 60,
+              height: 60,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) =>
+              const Icon(Icons.image_not_supported, size: 60),
+            )
+                : const Icon(Icons.school, size: 60, color: Colors.indigo),
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -122,8 +137,8 @@ class _SessionListScreenState extends State<SessionListScreen> {
                     _buildDetailRow(Icons.calendar_today,
                         '${_formatDate(session.startDate)} - ${_formatDate(session.endDate)}'),
                     _buildDetailRow(Icons.access_time, '${session.durationHours} Hours'),
-                    if (!session.isOnline)
-                      _buildDetailRow(Icons.location_on, session.location ?? ''),
+                    if (!session.isOnline && session.location != null)
+                      _buildDetailRow(Icons.location_on, session.location!),
                     _buildDetailRow(Icons.attach_money,
                         session.price > 0 ? '\$${session.price}' : 'Free'),
                   ],
@@ -137,207 +152,526 @@ class _SessionListScreenState extends State<SessionListScreen> {
   }
 
   void _showEditDialog(BuildContext context, Session session, SessionViewModel vm) {
+    final formKey = GlobalKey<FormState>();
+    final titleController = TextEditingController(text: session.title);
+    final descriptionController = TextEditingController(text: session.description);
+    final priceController = TextEditingController(text: session.price.toString());
+    final durationController = TextEditingController(text: session.durationHours.toString());
+    final locationController = TextEditingController(text: session.location ?? '');
+
+    String selectedCategory = session.category;
+    bool isOnline = session.isOnline;
+    DateTime? startDate = session.startDate;
+    DateTime? endDate = session.endDate;
+    bool isBooked = session.isBooked;
+
+    final List<String> categories = [
+      'Technology',
+      'Business',
+      'Design',
+      'Marketing',
+      'Photography',
+      'Music',
+      'Health & Fitness',
+      'Language',
+      'Cooking',
+      'Other'
+    ];
+
     showDialog(
       context: context,
-      barrierDismissible: true,
+      barrierDismissible: false,
       builder: (BuildContext context) {
-        return Dialog(
-          backgroundColor: const Color(0xFF1E1E1E),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.9,
-            height: MediaQuery.of(context).size.height * 0.8,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Header
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Course Details',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.close, color: Colors.white),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Course Image
-                  if (session.image.isNotEmpty)
-                    Center(
-                      child: Container(
-                        width: 120,
-                        height: 120,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: const Color(0xFF404040)),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: session.image.startsWith('http')
-                              ? Image.network(
-                            session.image,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                color: const Color(0xFF2D2D2D),
-                                child: const Icon(Icons.image, color: Colors.grey, size: 40),
-                              );
-                            },
-                          )
-                              : Image.file(
-                            File(session.image),
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                color: const Color(0xFF2D2D2D),
-                                child: const Icon(Icons.image, color: Colors.grey, size: 40),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-                  const SizedBox(height: 24),
-
-                  // Course Details Section
-                  _buildDisplaySection('Course Information'),
-                  const SizedBox(height: 16),
-
-                  _buildDisplayItem('Course Title', session.title, Icons.title),
-                  const SizedBox(height: 12),
-
-                  _buildDisplayItem('Description', session.description, Icons.description),
-                  const SizedBox(height: 12),
-
-                  _buildDisplayItem('Category', session.category, Icons.category),
-                  const SizedBox(height: 12),
-
-                  _buildDisplayItem(
-                      'Price',
-                      session.price > 0 ? '\$${session.price.toStringAsFixed(2)}' : 'Free',
-                      Icons.attach_money
-                  ),
-                  const SizedBox(height: 12),
-
-                  _buildDisplayItem('Duration', '${session.durationHours} Hours', Icons.access_time),
-                  const SizedBox(height: 24),
-
-                  // Delivery Method Section
-                  _buildDisplaySection('Delivery Method'),
-                  const SizedBox(height: 16),
-                  _buildDisplayItem(
-                      'Type',
-                      session.isOnline ? 'Online Course' : 'In-Person Course',
-                      session.isOnline ? Icons.computer : Icons.location_on
-                  ),
-                  const SizedBox(height: 12),
-
-                  if (!session.isOnline && session.location != null && session.location!.isNotEmpty)
-                    _buildDisplayItem('Location', session.location!, Icons.place),
-                  const SizedBox(height: 24),
-
-                  // Schedule Section
-                  _buildDisplaySection('Schedule'),
-                  const SizedBox(height: 16),
-                  _buildDisplayItem(
-                      'Start Date',
-                      session.startDate != null
-                          ? '${session.startDate!.day}/${session.startDate!.month}/${session.startDate!.year}'
-                          : 'Not set',
-                      Icons.calendar_today
-                  ),
-                  const SizedBox(height: 12),
-
-                  _buildDisplayItem(
-                      'End Date',
-                      session.endDate != null
-                          ? '${session.endDate!.day}/${session.endDate!.month}/${session.endDate!.year}'
-                          : 'Not set',
-                      Icons.event
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Booking Status Section
-                  _buildDisplaySection('Booking Status'),
-                  const SizedBox(height: 16),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: session.isBooked ? Colors.green.withOpacity(0.1) : Colors.grey.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: session.isBooked ? Colors.green : Colors.grey,
-                        width: 1,
-                      ),
-                    ),
-                    child: Row(
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Dialog(
+              backgroundColor: const Color(0xFF1E1E1E),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.9,
+                height: MediaQuery.of(context).size.height * 0.85,
+                child: Form(
+                  key: formKey,
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
-                          session.isBooked ? Icons.check_circle : Icons.pending,
-                          color: session.isBooked ? Colors.green : Colors.grey,
-                          size: 24,
+                        // Header
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Edit Course',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () => Navigator.pop(context),
+                              icon: const Icon(Icons.close, color: Colors.white),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 12),
-                        Text(
-                          session.isBooked ? 'Booked' : 'Not Booked',
-                          style: TextStyle(
-                            color: session.isBooked ? Colors.green : Colors.grey,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                        const SizedBox(height: 24),
+
+                        // Course Details Section
+                        _buildSectionTitle('Course Details'),
+                        const SizedBox(height: 16),
+
+                        // Course Title
+                        _buildDialogTextField(
+                          controller: titleController,
+                          label: 'Course Title',
+                          icon: Icons.title,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter course title';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Description
+                        _buildDialogTextField(
+                          controller: descriptionController,
+                          label: 'Description',
+                          icon: Icons.description,
+                          maxLines: 3,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter description';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Category Dropdown
+                        Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF2D2D2D),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: const Color(0xFF404040)),
                           ),
+                          child: DropdownButtonFormField<String>(
+                            value: selectedCategory,
+                            decoration: const InputDecoration(
+                              labelText: 'Category',
+                              labelStyle: TextStyle(color: Colors.grey),
+                              prefixIcon: Icon(Icons.category, color: Colors.grey),
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.all(16),
+                            ),
+                            dropdownColor: const Color(0xFF2D2D2D),
+                            style: const TextStyle(color: Colors.white),
+                            items: categories.map((category) {
+                              return DropdownMenuItem(
+                                value: category,
+                                child: Text(category),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                selectedCategory = value!;
+                              });
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Price
+                        _buildDialogTextField(
+                          controller: priceController,
+                          label: 'Price (\$)',
+                          icon: Icons.attach_money,
+                          keyboardType: TextInputType.number,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter price';
+                            }
+                            if (double.tryParse(value) == null) {
+                              return 'Please enter valid price';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Duration
+                        _buildDialogTextField(
+                          controller: durationController,
+                          label: 'Duration (Total hours)',
+                          icon: Icons.access_time,
+                          keyboardType: TextInputType.number,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter duration';
+                            }
+                            if (int.tryParse(value) == null) {
+                              return 'Please enter valid duration';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 24),
+
+                        // Delivery Method Section
+                        _buildSectionTitle('Delivery Method'),
+                        const SizedBox(height: 16),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF2D2D2D),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: const Color(0xFF404040)),
+                          ),
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    Radio<bool>(
+                                      value: true,
+                                      groupValue: isOnline,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          isOnline = value!;
+                                        });
+                                      },
+                                      activeColor: Colors.blue,
+                                    ),
+                                    const Text(
+                                      'Online',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    Radio<bool>(
+                                      value: false,
+                                      groupValue: isOnline,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          isOnline = value!;
+                                        });
+                                      },
+                                      activeColor: Colors.blue,
+                                    ),
+                                    const Text(
+                                      'In-Person',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Location field (only show if in-person)
+                        if (!isOnline)
+                          _buildDialogTextField(
+                            controller: locationController,
+                            label: 'Location',
+                            icon: Icons.location_on,
+                            validator: (value) {
+                              if (!isOnline && (value == null || value.isEmpty)) {
+                                return 'Please enter location for in-person course';
+                              }
+                              return null;
+                            },
+                          ),
+                        if (!isOnline) const SizedBox(height: 24),
+
+                        // Booking Status Section
+                        _buildSectionTitle('Booking Status'),
+                        const SizedBox(height: 16),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF2D2D2D),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: const Color(0xFF404040)),
+                          ),
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    Radio<bool>(
+                                      value: true,
+                                      groupValue: isBooked,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          isBooked = value!;
+                                        });
+                                      },
+                                      activeColor: Colors.green,
+                                    ),
+                                    const Text(
+                                      'Booked',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    Radio<bool>(
+                                      value: false,
+                                      groupValue: isBooked,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          isBooked = value!;
+                                        });
+                                      },
+                                      activeColor: Colors.grey,
+                                    ),
+                                    const Text(
+                                      'Not Booked',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+
+                        // Schedule Section
+                        _buildSectionTitle('Schedule'),
+                        const SizedBox(height: 16),
+
+                        // Start Date
+                        GestureDetector(
+                          onTap: () async {
+                            final DateTime? picked = await showDatePicker(
+                              context: context,
+                              initialDate: startDate ?? DateTime.now(),
+                              firstDate: DateTime.now(),
+                              lastDate: DateTime(2101),
+                              builder: (context, child) {
+                                return Theme(
+                                  data: Theme.of(context).copyWith(
+                                    colorScheme: const ColorScheme.dark(
+                                      primary: Colors.blue,
+                                      onPrimary: Colors.white,
+                                      surface: Color(0xFF2D2D2D),
+                                      onSurface: Colors.white,
+                                    ),
+                                  ),
+                                  child: child!,
+                                );
+                              },
+                            );
+                            if (picked != null && picked != startDate) {
+                              setState(() {
+                                startDate = picked;
+                              });
+                            }
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF2D2D2D),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: const Color(0xFF404040)),
+                            ),
+                            padding: const EdgeInsets.all(16),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.calendar_today, color: Colors.grey),
+                                const SizedBox(width: 16),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'Start Date',
+                                      style: TextStyle(color: Colors.grey, fontSize: 12),
+                                    ),
+                                    Text(
+                                      startDate != null
+                                          ? '${startDate!.day}/${startDate!.month}/${startDate!.year}'
+                                          : 'Select start date',
+                                      style: const TextStyle(color: Colors.white, fontSize: 16),
+                                    ),
+                                  ],
+                                ),
+                                const Spacer(),
+                                const Icon(Icons.arrow_forward_ios, color: Colors.grey, size: 16),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // End Date
+                        GestureDetector(
+                          onTap: () async {
+                            final DateTime? picked = await showDatePicker(
+                              context: context,
+                              initialDate: endDate ?? (startDate?.add(const Duration(days: 30)) ?? DateTime.now()),
+                              firstDate: startDate ?? DateTime.now(),
+                              lastDate: DateTime(2101),
+                              builder: (context, child) {
+                                return Theme(
+                                  data: Theme.of(context).copyWith(
+                                    colorScheme: const ColorScheme.dark(
+                                      primary: Colors.blue,
+                                      onPrimary: Colors.white,
+                                      surface: Color(0xFF2D2D2D),
+                                      onSurface: Colors.white,
+                                    ),
+                                  ),
+                                  child: child!,
+                                );
+                              },
+                            );
+                            if (picked != null && picked != endDate) {
+                              setState(() {
+                                endDate = picked;
+                              });
+                            }
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF2D2D2D),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: const Color(0xFF404040)),
+                            ),
+                            padding: const EdgeInsets.all(16),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.calendar_today, color: Colors.grey),
+                                const SizedBox(width: 16),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'End Date (Optional)',
+                                      style: TextStyle(color: Colors.grey, fontSize: 12),
+                                    ),
+                                    Text(
+                                      endDate != null
+                                          ? '${endDate!.day}/${endDate!.month}/${endDate!.year}'
+                                          : 'Select end date',
+                                      style: const TextStyle(color: Colors.white, fontSize: 16),
+                                    ),
+                                  ],
+                                ),
+                                const Spacer(),
+                                const Icon(Icons.arrow_forward_ios, color: Colors.grey, size: 16),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+
+                        // Action Buttons
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () => Navigator.pop(context),
+                                style: OutlinedButton.styleFrom(
+                                  side: const BorderSide(color: Colors.grey),
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Cancel',
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  if (formKey.currentState!.validate()) {
+                                    // Validation for start date
+                                    if (startDate == null) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                          content: Text('Please select a start date'),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                      return;
+                                    }
+
+                                    final updatedSession = Session(
+                                      id: session.id,
+                                      title: titleController.text,
+                                      description: descriptionController.text,
+                                      category: selectedCategory,
+                                      price: double.parse(priceController.text),
+                                      durationHours: int.parse(durationController.text),
+                                      isOnline: isOnline,
+                                      image: session.image,
+                                      startDate: startDate!, // Now guaranteed to be non-null
+                                      endDate: endDate, // This can be null
+                                      location: isOnline ? null : locationController.text,
+                                      isBooked: isBooked,
+                                    );
+
+                                    vm.updateSession(updatedSession);
+
+                                    Navigator.pop(context);
+
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Course updated successfully!'),
+                                        backgroundColor: Colors.green,
+                                      ),
+                                    );
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blue,
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Update Course',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 32),
-
-                  // Close Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: const Text(
-                        'Close',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-          ),
+            );
+          },
         );
       },
     );
   }
 
-  Widget _buildDisplaySection(String title) {
+  Widget _buildSectionTitle(String title) {
     return Text(
       title,
       style: const TextStyle(
@@ -348,44 +682,33 @@ class _SessionListScreenState extends State<SessionListScreen> {
     );
   }
 
-  Widget _buildDisplayItem(String label, String value, IconData icon) {
+  Widget _buildDialogTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    int maxLines = 1,
+    TextInputType? keyboardType,
+    String? Function(String?)? validator,
+  }) {
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: const Color(0xFF2D2D2D),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: const Color(0xFF404040)),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, color: Colors.grey, size: 20),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  value,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+      child: TextFormField(
+        controller: controller,
+        maxLines: maxLines,
+        keyboardType: keyboardType,
+        validator: validator,
+        style: const TextStyle(color: Colors.white),
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: const TextStyle(color: Colors.grey),
+          prefixIcon: Icon(icon, color: Colors.grey),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.all(16),
+        ),
       ),
     );
   }

@@ -70,7 +70,7 @@ class _CreateCoursePageState extends State<CreateCoursePage> {
   void _createCourse() async {
     if (_formKey.currentState!.validate()) {
       final viewModel = Provider.of<SessionViewModel>(context, listen: false);
-      
+
       await viewModel.createSession(
         title: _titleController.text,
         description: _descriptionController.text,
@@ -147,27 +147,27 @@ class _CreateCoursePageState extends State<CreateCoursePage> {
                               ),
                               child: viewModel.selectedImage != null
                                   ? ClipRRect(
-                                      borderRadius: BorderRadius.circular(8),
-                                      child: Image.file(
-                                        viewModel.selectedImage!,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    )
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.file(
+                                  viewModel.selectedImage!,
+                                  fit: BoxFit.cover,
+                                ),
+                              )
                                   : const Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.camera_alt,
-                                          size: 40,
-                                          color: Colors.grey,
-                                        ),
-                                        SizedBox(height: 8),
-                                        Text(
-                                          'Tap to select image',
-                                          style: TextStyle(color: Colors.grey),
-                                        ),
-                                      ],
-                                    ),
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.camera_alt,
+                                    size: 40,
+                                    color: Colors.grey,
+                                  ),
+                                  SizedBox(height: 8),
+                                  Text(
+                                    'Tap to select image',
+                                    style: TextStyle(color: Colors.grey),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
@@ -192,7 +192,7 @@ class _CreateCoursePageState extends State<CreateCoursePage> {
                             ),
                           ),
                           const SizedBox(height: 16),
-                          
+
                           // Title
                           TextFormField(
                             controller: _titleController,
@@ -379,7 +379,7 @@ class _CreateCoursePageState extends State<CreateCoursePage> {
                             ),
                           ),
                           const SizedBox(height: 16),
-                          
+
                           // Start Date
                           ListTile(
                             leading: const Icon(Icons.calendar_today),
@@ -391,7 +391,7 @@ class _CreateCoursePageState extends State<CreateCoursePage> {
                             onTap: () => _selectDate(context, isStartDate: true),
                           ),
                           const Divider(),
-                          
+
                           // End Date (Optional)
                           ListTile(
                             leading: const Icon(Icons.event),
@@ -423,24 +423,24 @@ class _CreateCoursePageState extends State<CreateCoursePage> {
                     ),
                     child: viewModel.isLoading
                         ? const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
-                              ),
-                              SizedBox(width: 12),
-                              Text('Creating Course...'),
-                            ],
-                          )
-                        : const Text(
-                            'Create Course',
-                            style: TextStyle(fontSize: 16),
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
                           ),
+                        ),
+                        SizedBox(width: 12),
+                        Text('Creating Course...'),
+                      ],
+                    )
+                        : const Text(
+                      'Create Course',
+                      style: TextStyle(fontSize: 16),
+                    ),
                   ),
                   const SizedBox(height: 16),
                 ],
