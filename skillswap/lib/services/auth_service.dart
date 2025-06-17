@@ -24,6 +24,8 @@ class AuthService {
         password: password,
       );
 
+      final uid = credential.user!.uid;
+
       final data = {
         'email': email,
         'fullName': fullName,
@@ -32,7 +34,17 @@ class AuthService {
         'createdAt': FieldValue.serverTimestamp(),
       };
 
-      await _firestore.collection('users').doc(credential.user!.uid).set(data);
+      await _firestore.collection('students').doc(credential.user!.uid).set(data);
+
+      final generalUserData = {
+        'email': email,
+        'fullName': fullName,
+        'location': location,
+        'userType': 'student',
+        'createdAt': FieldValue.serverTimestamp(),
+      };
+
+      await _firestore.collection('users').doc(uid).set(generalUserData);
 
       return StudentModel(
         uid: credential.user!.uid,
@@ -75,6 +87,8 @@ class AuthService {
         password: password,
       );
 
+      final uid = credential.user!.uid;
+
       // Upload profile image if provided
       if (profileImage != null) {
         try {
@@ -102,7 +116,18 @@ class AuthService {
         'createdAt': FieldValue.serverTimestamp(),
       };
 
-      await _firestore.collection('users').doc(credential.user!.uid).set(data);
+      await _firestore.collection('instructors').doc(credential.user!.uid).set(data);
+
+
+      final generalUserData = {
+        'email': email,
+        'fullName': fullName,
+        'location': location,
+        'userType': 'instructor',
+        'createdAt': FieldValue.serverTimestamp(),
+      };
+
+      await _firestore.collection('users').doc(uid).set(generalUserData);
 
       return InstructorModel(
         uid: credential.user!.uid,
