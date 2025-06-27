@@ -1,668 +1,624 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../viewmodels/session_view_model.dart';
+import '../../widgets/empty_state.dart';
 
-class CreateCoursePage extends StatefulWidget {
-  const CreateCoursePage({Key? key}) : super(key: key);
+class CreateSessionScreen extends StatefulWidget {
+  const CreateSessionScreen({super.key});
 
   @override
-  State<CreateCoursePage> createState() => _CreateCoursePageState();
+  State<CreateSessionScreen> createState() => _CreateSessionScreenState();
 }
 
-class _CreateCoursePageState extends State<CreateCoursePage> {
+class _CreateSessionScreenState extends State<CreateSessionScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _locationController = TextEditingController();
-  final _meetingUrlController = TextEditingController(); // Added meeting URL controller
   final _priceController = TextEditingController();
   final _durationController = TextEditingController();
+  final _locationController = TextEditingController();
+  final _meetingUrlController = TextEditingController();
 
-  String _selectedCategory = 'Technology';
-  bool _isOnline = true;
-  DateTime _startDate = DateTime.now();
-  DateTime? _endDate;
+  String _selectedCategory = 'Development';
+  bool _isOnline = false;
+  DateTime _selectedDate = DateTime.now().add(const Duration(days: 1));
+  TimeOfDay _selectedTime = const TimeOfDay(hour: 9, minute: 0);
+  bool _isLoading = false;
 
   final List<String> _categories = [
-    'Technology',
-    'Business',
+    'Development',
     'Design',
+    'Business',
     'Marketing',
     'Photography',
     'Music',
     'Language',
-    'Fitness',
-    'Cooking',
-    'Art',
+    'Science',
+    'Technology',
+    'Arts',
   ];
-
-  @override
-  void dispose() {
-    _titleController.dispose();
-    _descriptionController.dispose();
-    _locationController.dispose();
-    _meetingUrlController.dispose(); // Dispose meeting URL controller
-    _priceController.dispose();
-    _durationController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _selectDate(BuildContext context, {required bool isStartDate}) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: isStartDate ? _startDate : (_endDate ?? _startDate.add(const Duration(days: 1))),
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
-    );
-    if (picked != null) {
-      setState(() {
-        if (isStartDate) {
-          _startDate = picked;
-          // Reset end date if it's before the new start date
-          if (_endDate != null && _endDate!.isBefore(_startDate)) {
-            _endDate = null;
-          }
-        } else {
-          _endDate = picked;
-        }
-      });
-    }
-  }
-
-  void _createCourse() async {
-    if (_formKey.currentState!.validate()) {
-      final viewModel = Provider.of<SessionViewModel>(context, listen: false);
-
-      // Clear any previous errors
-      viewModel.clearError();
-
-      await viewModel.createSession(
-        title: _titleController.text.trim(),
-        description: _descriptionController.text.trim(),
-        category: _selectedCategory,
-        isOnline: _isOnline,
-        location: _isOnline ? null : _locationController.text.trim(),
-        meetingUrl: _isOnline ? _meetingUrlController.text.trim() : null, // Added meeting URL
-        price: double.parse(_priceController.text),
-        startDate: _startDate,
-        endDate: _endDate,
-        durationHours: int.parse(_durationController.text),
-      );
-
-      if (mounted) {
-        if (viewModel.error == null) {
-          Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Course created successfully!'),
-              backgroundColor: Colors.green,
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(viewModel.error!),
-              backgroundColor: Colors.red,
-              duration: const Duration(seconds: 5),
-            ),
-          );
-        }
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        title: const Text('Create New Course'),
-        backgroundColor: Colors.indigo,
-        foregroundColor: Colors.white,
+        title: const Text('Create Session'),
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
         elevation: 0,
       ),
-      body: Consumer<SessionViewModel>(
-        builder: (context, viewModel, child) {
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Course Image Section
-                  Card(
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              const Icon(Icons.image, color: Colors.indigo),
-                              const SizedBox(width: 8),
-                              const Text(
-                                'Course Image',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const Spacer(),
-                              if (viewModel.selectedImage != null)
-                                IconButton(
-                                  icon: const Icon(Icons.clear, color: Colors.red),
-                                  onPressed: viewModel.clearSelectedImage,
-                                  tooltip: 'Remove image',
-                                ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          GestureDetector(
-                            onTap: viewModel.pickImage,
-                            child: Container(
-                              height: 200,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: Colors.grey[200],
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: Colors.grey[300]!),
-                              ),
-                              child: viewModel.selectedImage != null
-                                  ? ClipRRect(
-                                      borderRadius: BorderRadius.circular(8),
-                                      child: Image.file(
-                                        viewModel.selectedImage!,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    )
-                                  : const Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.camera_alt,
-                                          size: 40,
-                                          color: Colors.grey,
-                                        ),
-                                        SizedBox(height: 8),
-                                        Text(
-                                          'Tap to select image',
-                                          style: TextStyle(color: Colors.grey),
-                                        ),
-                                        SizedBox(height: 4),
-                                        Text(
-                                          '(Optional)',
-                                          style: TextStyle(
-                                            color: Colors.grey,
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF667eea), Color(0xFF764ba2)],
                   ),
-                  const SizedBox(height: 16),
-
-                  // Course Details Section
-                  Card(
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Row(
-                            children: [
-                              Icon(Icons.info_outline, color: Colors.indigo),
-                              SizedBox(width: 8),
-                              Text(
-                                'Course Details',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-
-                          // Title
-                          TextFormField(
-                            controller: _titleController,
-                            decoration: const InputDecoration(
-                              labelText: 'Course Title *',
-                              hintText: 'Enter an engaging course title',
-                              border: OutlineInputBorder(),
-                              prefixIcon: Icon(Icons.title),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.trim().isEmpty) {
-                                return 'Please enter a course title';
-                              }
-                              if (value.trim().length < 3) {
-                                return 'Title must be at least 3 characters long';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 16),
-
-                          // Description
-                          TextFormField(
-                            controller: _descriptionController,
-                            decoration: const InputDecoration(
-                              labelText: 'Description *',
-                              hintText: 'Describe what students will learn',
-                              border: OutlineInputBorder(),
-                              prefixIcon: Icon(Icons.description),
-                            ),
-                            maxLines: 4,
-                            validator: (value) {
-                              if (value == null || value.trim().isEmpty) {
-                                return 'Please enter a description';
-                              }
-                              if (value.trim().length < 10) {
-                                return 'Description must be at least 10 characters long';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 16),
-
-                          // Category
-                          DropdownButtonFormField<String>(
-                            value: _selectedCategory,
-                            decoration: const InputDecoration(
-                              labelText: 'Category *',
-                              border: OutlineInputBorder(),
-                              prefixIcon: Icon(Icons.category),
-                            ),
-                            items: _categories.map((String category) {
-                              return DropdownMenuItem<String>(
-                                value: category,
-                                child: Text(category),
-                              );
-                            }).toList(),
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                _selectedCategory = newValue!;
-                              });
-                            },
-                          ),
-                          const SizedBox(height: 16),
-
-                          // Price
-                          TextFormField(
-                            controller: _priceController,
-                            decoration: const InputDecoration(
-                              labelText: 'Price (\$) *',
-                              hintText: '0.00',
-                              border: OutlineInputBorder(),
-                              prefixIcon: Icon(Icons.attach_money),
-                            ),
-                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter a price';
-                              }
-                              final price = double.tryParse(value);
-                              if (price == null) {
-                                return 'Please enter a valid price';
-                              }
-                              if (price < 0) {
-                                return 'Price cannot be negative';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 16),
-
-                          // Duration
-                          TextFormField(
-                            controller: _durationController,
-                            decoration: const InputDecoration(
-                              labelText: 'Duration (Total hours) *',
-                              hintText: 'e.g., 10',
-                              border: OutlineInputBorder(),
-                              prefixIcon: Icon(Icons.schedule),
-                            ),
-                            keyboardType: TextInputType.number,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter duration in hours';
-                              }
-                              final duration = int.tryParse(value);
-                              if (duration == null || duration <= 0) {
-                                return 'Please enter a valid duration (positive number)';
-                              }
-                              if (duration > 1000) {
-                                return 'Duration seems too long. Please check.';
-                              }
-                              return null;
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Delivery Method Section
-                  Card(
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Row(
-                            children: [
-                              Icon(Icons.delivery_dining, color: Colors.indigo),
-                              SizedBox(width: 8),
-                              Text(
-                                'Delivery Method',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          
-                          // Online/In-Person Toggle
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey[300]!),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: InkWell(
-                                    onTap: () => setState(() => _isOnline = true),
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(vertical: 12),
-                                      decoration: BoxDecoration(
-                                        color: _isOnline ? Colors.indigo : Colors.transparent,
-                                        borderRadius: const BorderRadius.only(
-                                          topLeft: Radius.circular(8),
-                                          bottomLeft: Radius.circular(8),
-                                        ),
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons.computer,
-                                            color: _isOnline ? Colors.white : Colors.grey[600],
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Text(
-                                            'Online',
-                                            style: TextStyle(
-                                              color: _isOnline ? Colors.white : Colors.grey[600],
-                                              fontWeight: _isOnline ? FontWeight.bold : FontWeight.normal,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: InkWell(
-                                    onTap: () => setState(() => _isOnline = false),
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(vertical: 12),
-                                      decoration: BoxDecoration(
-                                        color: !_isOnline ? Colors.indigo : Colors.transparent,
-                                        borderRadius: const BorderRadius.only(
-                                          topRight: Radius.circular(8),
-                                          bottomRight: Radius.circular(8),
-                                        ),
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons.location_on,
-                                            color: !_isOnline ? Colors.white : Colors.grey[600],
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Text(
-                                            'In-Person',
-                                            style: TextStyle(
-                                              color: !_isOnline ? Colors.white : Colors.grey[600],
-                                              fontWeight: !_isOnline ? FontWeight.bold : FontWeight.normal,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          
-                          const SizedBox(height: 16),
-                          
-                          // Location or Meeting URL field
-                          if (_isOnline) ...[
-                            TextFormField(
-                              controller: _meetingUrlController,
-                              decoration: const InputDecoration(
-                                labelText: 'Meeting URL *',
-                                hintText: 'https://zoom.us/j/123456789',
-                                border: OutlineInputBorder(),
-                                prefixIcon: Icon(Icons.video_call),
-                              ),
-                              validator: (value) {
-                                if (_isOnline && (value == null || value.trim().isEmpty)) {
-                                  return 'Please enter a meeting URL for online course';
-                                }
-                                if (_isOnline && value != null && value.trim().isNotEmpty) {
-                                  // Basic URL validation
-                                  if (!value.trim().startsWith('http://') && 
-                                      !value.trim().startsWith('https://')) {
-                                    return 'Please enter a valid URL (starting with http:// or https://)';
-                                  }
-                                }
-                                return null;
-                              },
-                            ),
-                          ] else ...[
-                            TextFormField(
-                              controller: _locationController,
-                              decoration: const InputDecoration(
-                                labelText: 'Location *',
-                                hintText: 'Enter venue address',
-                                border: OutlineInputBorder(),
-                                prefixIcon: Icon(Icons.location_on),
-                              ),
-                              validator: (value) {
-                                if (!_isOnline && (value == null || value.trim().isEmpty)) {
-                                  return 'Please enter a location for in-person course';
-                                }
-                                return null;
-                              },
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Schedule Section
-                  Card(
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Row(
-                            children: [
-                              Icon(Icons.calendar_today, color: Colors.indigo),
-                              SizedBox(width: 8),
-                              Text(
-                                'Schedule',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-
-                          // Start Date
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey[300]!),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: ListTile(
-                              leading: const Icon(Icons.calendar_today, color: Colors.indigo),
-                              title: const Text('Start Date *'),
-                              subtitle: Text(
-                                '${_startDate.day}/${_startDate.month}/${_startDate.year}',
-                                style: const TextStyle(fontWeight: FontWeight.w500),
-                              ),
-                              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                              onTap: () => _selectDate(context, isStartDate: true),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-
-                          // End Date (Optional)
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey[300]!),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: ListTile(
-                              leading: const Icon(Icons.event, color: Colors.grey),
-                              title: const Text('End Date (Optional)'),
-                              subtitle: Text(
-                                _endDate != null
-                                    ? '${_endDate!.day}/${_endDate!.month}/${_endDate!.year}'
-                                    : 'Not set',
-                                style: TextStyle(
-                                  fontWeight: _endDate != null ? FontWeight.w500 : FontWeight.normal,
-                                  color: _endDate != null ? Colors.black87 : Colors.grey,
-                                ),
-                              ),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  if (_endDate != null)
-                                    IconButton(
-                                      icon: const Icon(Icons.clear, size: 16, color: Colors.red),
-                                      onPressed: () => setState(() => _endDate = null),
-                                      tooltip: 'Clear end date',
-                                    ),
-                                  const Icon(Icons.arrow_forward_ios, size: 16),
-                                ],
-                              ),
-                              onTap: () => _selectDate(context, isStartDate: false),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Error Display
-                  if (viewModel.error != null)
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  children: [
                     Container(
-                      margin: const EdgeInsets.only(bottom: 16),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.red[50],
-                        border: Border.all(color: Colors.red[300]!),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.error_outline, color: Colors.red[700]),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              viewModel.error!,
-                              style: TextStyle(color: Colors.red[700]),
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.close, size: 16),
-                            onPressed: viewModel.clearError,
-                            color: Colors.red[700],
-                          ),
-                        ],
-                      ),
-                    ),
-
-                  // Create Course Button
-                  ElevatedButton(
-                    onPressed: viewModel.isLoading ? null : _createCourse,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.indigo,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
+                        color: Colors.white.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      elevation: 2,
+                      child: const Icon(
+                        Icons.add_circle_outline,
+                        color: Colors.white,
+                        size: 32,
+                      ),
                     ),
-                    child: viewModel.isLoading
-                        ? const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
-                              ),
-                              SizedBox(width: 12),
-                              Text('Creating Course...'),
-                            ],
-                          )
-                        : const Text(
-                            'Create Course',
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          Text(
+                            'Create New Session',
                             style: TextStyle(
-                              fontSize: 16,
+                              color: Colors.white,
+                              fontSize: 20,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
+                          SizedBox(height: 4),
+                          Text(
+                            'Share your knowledge with students',
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              const SizedBox(height: 24),
+              
+              // Basic Information
+              _buildSectionTitle('Basic Information'),
+              const SizedBox(height: 16),
+              
+              _buildTextField(
+                controller: _titleController,
+                label: 'Session Title',
+                hint: 'Enter session title',
+                icon: Icons.title,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter session title';
+                  }
+                  return null;
+                },
+              ),
+              
+              const SizedBox(height: 16),
+              
+              _buildTextField(
+                controller: _descriptionController,
+                label: 'Description',
+                hint: 'Describe what students will learn',
+                icon: Icons.description,
+                maxLines: 3,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter session description';
+                  }
+                  return null;
+                },
+              ),
+              
+              const SizedBox(height: 16),
+              
+              // Category and Type
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildDropdownField(
+                      label: 'Category',
+                      value: _selectedCategory,
+                      items: _categories,
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedCategory = value!;
+                        });
+                      },
+                    ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _buildSwitchField(
+                      label: 'Online Session',
+                      value: _isOnline,
+                      onChanged: (value) {
+                        setState(() {
+                          _isOnline = value;
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              
+              const SizedBox(height: 24),
+              
+              // Date and Time
+              _buildSectionTitle('Schedule'),
+              const SizedBox(height: 16),
+              
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildDateField(),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _buildTimeField(),
+                  ),
+                ],
+              ),
+              
+              const SizedBox(height: 24),
+              
+              // Session Details
+              _buildSectionTitle('Session Details'),
+              const SizedBox(height: 16),
+              
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildTextField(
+                      controller: _priceController,
+                      label: 'Price (\$)',
+                      hint: '0.00',
+                      icon: Icons.attach_money,
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter price';
+                        }
+                        if (double.tryParse(value) == null) {
+                          return 'Please enter valid price';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _buildTextField(
+                      controller: _durationController,
+                      label: 'Duration (hours)',
+                      hint: '2',
+                      icon: Icons.access_time,
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter duration';
+                        }
+                        if (int.tryParse(value) == null) {
+                          return 'Please enter valid duration';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              
+              const SizedBox(height: 16),
+              
+              // Location or Meeting URL
+              if (_isOnline)
+                _buildTextField(
+                  controller: _meetingUrlController,
+                  label: 'Meeting URL',
+                  hint: 'https://meet.google.com/...',
+                  icon: Icons.link,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter meeting URL';
+                    }
+                    return null;
+                  },
+                )
+              else
+                _buildTextField(
+                  controller: _locationController,
+                  label: 'Location',
+                  hint: 'Enter session location',
+                  icon: Icons.location_on,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter location';
+                    }
+                    return null;
+                  },
+                ),
+              
+              const SizedBox(height: 32),
+              
+              // Create Button
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _createSession,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF667eea),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: _isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text(
+                          'Create Session',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+        color: Colors.black87,
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required IconData icon,
+    int maxLines = 1,
+    TextInputType? keyboardType,
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      maxLines: maxLines,
+      keyboardType: keyboardType,
+      validator: validator,
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: hint,
+        prefixIcon: Icon(icon, color: Colors.grey.shade600),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF667eea), width: 2),
+        ),
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDropdownField({
+    required String label,
+    required String value,
+    required List<String> items,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return DropdownButtonFormField<String>(
+      value: value,
+      items: items.map((String item) {
+        return DropdownMenuItem<String>(
+          value: item,
+          child: Text(item),
+        );
+      }).toList(),
+      onChanged: onChanged,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: const Icon(Icons.category, color: Colors.grey),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF667eea), width: 2),
+        ),
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSwitchField({
+    required String label,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.computer, color: Colors.grey),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.black87,
+              ),
+            ),
+          ),
+          Switch(
+            value: value,
+            onChanged: onChanged,
+            activeColor: const Color(0xFF667eea),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDateField() {
+    return GestureDetector(
+      onTap: _selectDate,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.shade300),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.calendar_today, color: Colors.grey),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Date',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  Text(
+                    '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.black87,
+                    ),
+                  ),
                 ],
               ),
             ),
-          );
-        },
+          ],
+        ),
       ),
     );
+  }
+
+  Widget _buildTimeField() {
+    return GestureDetector(
+      onTap: _selectTime,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.shade300),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.access_time, color: Colors.grey),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Time',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  Text(
+                    _selectedTime.format(context),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _selectDate() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime.now().add(const Duration(days: 1)),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFF667eea),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
+  }
+
+  Future<void> _selectTime() async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: _selectedTime,
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFF667eea),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    
+    if (picked != null && picked != _selectedTime) {
+      setState(() {
+        _selectedTime = picked;
+      });
+    }
+  }
+
+  Future<void> _createSession() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // Combine date and time
+      final sessionDateTime = DateTime(
+        _selectedDate.year,
+        _selectedDate.month,
+        _selectedDate.day,
+        _selectedTime.hour,
+        _selectedTime.minute,
+      );
+
+      // Validate that session is not in the past
+      if (sessionDateTime.isBefore(DateTime.now())) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Session time cannot be in the past'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      await context.read<SessionViewModel>().createSession(
+        title: _titleController.text,
+        description: _descriptionController.text,
+        category: _selectedCategory,
+        isOnline: _isOnline,
+        location: _isOnline ? null : _locationController.text,
+        meetingUrl: _isOnline ? _meetingUrlController.text : null,
+        price: double.parse(_priceController.text),
+        startDate: sessionDateTime,
+        durationHours: int.parse(_durationController.text),
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Session created successfully!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      Navigator.pop(context);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to create session: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 }

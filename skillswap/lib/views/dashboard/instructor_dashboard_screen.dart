@@ -8,6 +8,7 @@ import 'package:skillswap/views/auth/login_screen.dart';
 import 'package:skillswap/views/timetable/timetable_screen.dart';
 import 'package:skillswap/views/notifications/notification_screen.dart';
 import 'package:skillswap/firebase_options.dart'; // Import the provided Firebase options
+import '../bookings/instructor_bookings_screen.dart';
 
 class InstructorHomeScreen extends StatefulWidget {
   const InstructorHomeScreen({super.key});
@@ -292,7 +293,7 @@ class _InstructorHomeScreenState extends State<InstructorHomeScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => CreateCoursePage(),
+                                builder: (context) => CreateSessionScreen(),
                               ),
                             );
                           },
@@ -323,6 +324,22 @@ class _InstructorHomeScreenState extends State<InstructorHomeScreen> {
                           onTap: () {},
                         ),
                         _buildFeatureCard(
+                          icon: Icons.bookmark,
+                          title: 'Bookings',
+                          iconColor: const Color(0xFFE91E63), // Pink
+                          backgroundGradient: const LinearGradient(
+                            colors: [Color(0xFFFCE4EC), Color(0xFFF8BBD9)],
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const InstructorBookingsScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                        _buildFeatureCard(
                           icon: Icons.analytics,
                           title: 'Analytics',
                           iconColor: const Color(0xFF7C4DFF), // Vibrant Purple
@@ -339,12 +356,18 @@ class _InstructorHomeScreenState extends State<InstructorHomeScreen> {
                             colors: [Color(0xFFFFEBEE), Color(0xFFFFCDD2)],
                           ),
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => TimetableScreen(),
-                              ),
-                            );
+                            final user = FirebaseAuth.instance.currentUser;
+                            if (user != null) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => InstructorTimetableScreen(
+                                    instructorId: user.uid,
+                                    instructorName: _instructorName,
+                                  ),
+                                ),
+                              );
+                            }
                           },
                         ),
                       ],

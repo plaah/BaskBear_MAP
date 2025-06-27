@@ -55,6 +55,16 @@ class BookingService {
     }
   }
 
+  // Retrieve all bookings for an instructor
+  Future<List<BookingModel>> getBookingsByInstructorId(String instructorId) async {
+    try {
+      final querySnapshot = await _firestore.collection('bookings').where('instructorId', isEqualTo: instructorId).get();
+      return querySnapshot.docs.map((doc) => BookingModel.fromMap(doc.data(), doc.id)).toList();
+    } catch (e) {
+      throw Exception('Failed to retrieve bookings for instructor: $e');
+    }
+  }
+
   // Delete a booking by ID
   Future<void> deleteBooking(String bookingId) async {
     try {

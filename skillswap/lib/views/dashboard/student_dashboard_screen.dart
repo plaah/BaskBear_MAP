@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../models/session_model.dart';
-import '../../services/session_service.dart';
-import '../../widgets/session_card.dart';
+import '../../viewmodels/session_view_model.dart';
+import '../../widgets/course_card.dart';
+import '../../widgets/search_bar.dart';
+import '../../widgets/empty_state.dart';
+import '../bookings/advanced_booking_screen.dart';
+import '../profile/student/student_profile_screen.dart';
 
 class StudentDashboardScreen extends StatefulWidget {
   final String studentId;
@@ -19,376 +24,218 @@ class StudentDashboardScreen extends StatefulWidget {
 }
 
 class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
-  final SessionService _sessionService = FirestoreSessionService();
-  List<Session> _allSessions = [];
-  List<Session> _enrolledSessions = [];
-  List<Session> _availableSessions = [];
-  bool _isLoading = true;
+  final TextEditingController _searchController = TextEditingController();
+  String _selectedCategory = 'All';
   String _selectedTab = 'available';
   int _selectedIndex = 0;
+  
+  final List<String> _categories = [
+    'Design',
+    'Development',
+    'Business',
+    'Marketing',
+    'Photography',
+    'Music',
+    'Language',
+    'Science',
+  ];
 
   @override
   void initState() {
     super.initState();
-    _loadSessions();
-  }
-
-  Future<void> _loadSessions() async {
-    setState(() => _isLoading = true);
-    
-    try {
-      final sessions = await _sessionService.getSessions();
-      
-      setState(() {
-        _allSessions = sessions;
-        _enrolledSessions = sessions.where((session) => 
-          session.enrolledStudentId == widget.studentId && 
-          !session.isCompleted
-        ).toList();
-        _availableSessions = sessions.where((session) => 
-          session.isAvailable
-        ).toList();
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() => _isLoading = false);
-      _showErrorSnackBar('Failed to load sessions: $e');
-    }
-  }
-
-  Future<void> _enrollInSession(Session session) async {
-    try {
-      final updatedSession = session.copyWith(
-        isBooked: true,
-        enrolledStudentId: widget.studentId,
-        enrolledStudentName: widget.studentName,
-        enrolledAt: DateTime.now(),
-        status: 'scheduled',
-      );
-
-      await FirebaseFirestore.instance
-          .collection('sessions')
-          .doc(session.id)
-          .update(updatedSession.toMap());
-
-      _showSuccessSnackBar('Successfully enrolled in ${session.title}!');
-      _loadSessions();
-    } catch (e) {
-      _showErrorSnackBar('Failed to enroll: $e');
-    }
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<SessionViewModel>().loadSessions();
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color.fromARGB(255, 204, 204, 253),
-              Color.fromARGB(255, 252, 253, 255),
-              Color.fromARGB(255, 206, 239, 255),
-            ],
+      backgroundColor: Colors.grey.shade50,
+      body: CustomScrollView(
+        slivers: [
+          // Modern App Bar
+          _buildAppBar(),
+          
+          // Search and Filters
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: SearchWithFilters(
+                searchController: _searchController,
+                selectedCategory: _selectedCategory,
+                categories: _categories,
+                onCategoryChanged: (category) {
+                  setState(() {
+                    _selectedCategory = category;
+                  });
+                },
+                onSearchChanged: (query) {
+                  setState(() {});
+                },
+              ),
+            ),
           ),
-        ),
-        child: CustomScrollView(
-          slivers: [
-            // PRESERVED: Original App Bar with User Info
-            SliverAppBar(
-              expandedHeight: 180,
-              floating: false,
-              pinned: true,
-              backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-              flexibleSpace: FlexibleSpaceBar(
-                background: Container(
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Color.fromARGB(255, 0, 51, 77),
-                        Color.fromARGB(255, 59, 148, 238),
-                        Color.fromARGB(255, 0, 10, 81),
-                      ],
+          
+          // Tab Bar
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: _buildTabBar(),
+            ),
+          ),
+          
+          // Content
+          SliverPadding(
+            padding: const EdgeInsets.all(16),
+            sliver: Consumer<SessionViewModel>(
+              builder: (context, viewModel, child) {
+                if (viewModel.isLoading) {
+                  return const SliverToBoxAdapter(
+                    child: Center(
+                      child: CircularProgressIndicator(),
                     ),
-                  ),
-                  child: SafeArea(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 16),
-                          Row(
-                            children: [
-                              const SizedBox(width: 20),
-                              Container(
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Colors.white.withOpacity(0.3),
-                                    width: 2,
-                                  ),
-                                ),
-                                child: const CircleAvatar(
-                                  radius: 22,
-                                  backgroundColor: Color(0xFF2196F3),
-                                  child: Icon(
-                                    Icons.person,
-                                    color: Colors.white,
-                                    size: 28,
-                                  ),
-                                ),
-                              ),
-                              const Spacer(),
-                              IconButton(
-                                icon: Badge(
-                                  smallSize: 8,
-                                  backgroundColor: Colors.amber,
-                                  child: const Icon(
-                                    Icons.notifications_outlined,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                onPressed: () {},
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Hello, ${widget.studentName} 👋',
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          const Text(
-                            'What would you like to learn today?',
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: Colors.white70,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
+                  );
+                }
+                
+                final filteredSessions = _getFilteredSessions(viewModel.sessions);
+                
+                if (filteredSessions.isEmpty) {
+                  return SliverToBoxAdapter(
+                    child: NoCoursesEmptyState(
+                      onRefresh: () => viewModel.loadSessions(),
                     ),
+                  );
+                }
+                
+                return SliverGrid(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.75,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
                   ),
-                ),
-              ),
-            ),
-            // NEW: Session-based Content
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Search Bar (preserved)
-                    Container(
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: TextField(
-                        style: const TextStyle(
-                          color: Colors.black87,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: 'Search sessions, topics, or instructors',
-                          hintStyle: TextStyle(
-                            color: Colors.grey.shade500,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          prefixIcon: Icon(
-                            Icons.search,
-                            color: Colors.grey.shade400,
-                          ),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(vertical: 15),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    
-                    // Session Stats Cards
-                    _buildStatsCards(),
-                    const SizedBox(height: 24),
-                    
-                    // Tab Selection
-                    _buildTabBar(),
-                    const SizedBox(height: 16),
-                    
-                    // Sessions List
-                    _isLoading 
-                        ? const Center(child: CircularProgressIndicator())
-                        : _buildSessionsList(),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-      // PRESERVED: Original Bottom Navigation
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, -5),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-          child: BottomNavigationBar(
-            type: BottomNavigationBarType.fixed,
-            backgroundColor: Colors.white,
-            selectedItemColor: const Color(0xFF2196F3),
-            unselectedItemColor: Colors.grey.shade500,
-            showSelectedLabels: false,
-            showUnselectedLabels: false,
-            elevation: 0,
-            currentIndex: _selectedIndex,
-            onTap: _onItemTapped,
-            items: [
-              BottomNavigationBarItem(
-                icon: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF2196F3).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final session = filteredSessions[index];
+                      return CourseCard(
+                        session: session,
+                        showEnrollButton: _selectedTab == 'available',
+                        onEnroll: () => _enrollInSession(session),
+                        onTap: () => _showSessionDetails(session),
+                      );
+                    },
+                    childCount: filteredSessions.length,
                   ),
-                  child: const Icon(Icons.home_filled),
-                ),
-                label: 'Home',
-              ),
-              const BottomNavigationBarItem(
-                icon: Icon(Icons.explore_outlined),
-                label: 'Explore',
-              ),
-              const BottomNavigationBarItem(
-                icon: Icon(Icons.bookmark_border),
-                label: 'Saved',
-              ),
-              const BottomNavigationBarItem(
-                icon: Icon(Icons.person_outline),
-                label: 'Profile',
-              ),
-            ],
-          ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _loadSessions,
-        child: const Icon(Icons.refresh),
-        backgroundColor: const Color(0xFF2196F3),
-      ),
-    );
-  }
-
-  Widget _buildStatsCards() {
-    final completedCount = _allSessions.where((s) => 
-      s.enrolledStudentId == widget.studentId && s.isCompleted
-    ).length;
-    
-    return Row(
-      children: [
-        Expanded(
-          child: _buildStatCard(
-            'Available', 
-            _availableSessions.length.toString(),
-            Colors.blue,
-            Icons.explore,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _buildStatCard(
-            'Enrolled', 
-            _enrolledSessions.length.toString(),
-            Colors.green,
-            Icons.book,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _buildStatCard(
-            'Completed', 
-            completedCount.toString(),
-            Colors.purple,
-            Icons.check_circle,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStatCard(String title, String count, Color color, IconData icon) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(height: 8),
-          Text(
-            count,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey[600],
+                );
+              },
             ),
           ),
         ],
+      ),
+      bottomNavigationBar: _buildBottomNavigationBar(),
+    );
+  }
+
+  Widget _buildAppBar() {
+    return SliverAppBar(
+      expandedHeight: 120,
+      floating: false,
+      pinned: true,
+      backgroundColor: Colors.white,
+      elevation: 0,
+      flexibleSpace: FlexibleSpaceBar(
+        background: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xFF667eea),
+                Color(0xFF764ba2),
+              ],
+            ),
+          ),
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 20,
+                        backgroundColor: Colors.white.withOpacity(0.2),
+                        child: Text(
+                          widget.studentName.isNotEmpty 
+                              ? widget.studentName[0].toUpperCase()
+                              : 'S',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Hello, ${widget.studentName} 👋',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const Text(
+                              'Ready to learn something new?',
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.notifications_outlined,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {},
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
 
   Widget _buildTabBar() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 0),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(25),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
           _buildTabButton('Available Courses', 'available'),
-          _buildTabButton('Enrolled Courses', 'enrolled'),
+          _buildTabButton('My Enrollments', 'enrolled'),
         ],
       ),
     );
@@ -400,16 +247,16 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
       child: GestureDetector(
         onTap: () => setState(() => _selectedTab = tabKey),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
+          padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFF2196F3) : Colors.transparent,
-            borderRadius: BorderRadius.circular(25),
+            color: isSelected ? const Color(0xFF667eea) : Colors.transparent,
+            borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
             title,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: isSelected ? Colors.white : Colors.grey[600],
+              color: isSelected ? Colors.white : Colors.grey.shade600,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               fontSize: 14,
             ),
@@ -419,73 +266,280 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
     );
   }
 
-  Widget _buildSessionsList() {
-    List<Session> sessionsToShow = _selectedTab == 'enrolled' 
-        ? _enrolledSessions 
-        : _availableSessions;
-
-    if (sessionsToShow.isEmpty) {
-      return Container(
-        height: 200,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+  Widget _buildBottomNavigationBar() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Icon(
-                _selectedTab == 'available' ? Icons.explore_off : Icons.book_outlined,
-                size: 64,
-                color: Colors.grey[400],
-              ),
-              const SizedBox(height: 16),
-              Text(
-                _selectedTab == 'available' 
-                    ? 'No sessions available'
-                    : 'No enrolled sessions',
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.grey[600],
-                ),
-              ),
+              _buildNavItem(Icons.home, 'Home', 0),
+              _buildNavItem(Icons.explore, 'Explore', 1),
+              _buildNavItem(Icons.bookmark, 'Bookings', 2),
+              _buildNavItem(Icons.person, 'Profile', 3),
             ],
           ),
         ),
-      );
+      ),
+    );
+  }
+
+  Widget _buildNavItem(IconData icon, String label, int index) {
+    final isSelected = _selectedIndex == index;
+    return GestureDetector(
+      onTap: () => _onItemTapped(index),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: isSelected ? const Color(0xFF667eea).withOpacity(0.1) : Colors.transparent,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              icon,
+              color: isSelected ? const Color(0xFF667eea) : Colors.grey.shade600,
+              size: 24,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: isSelected ? const Color(0xFF667eea) : Colors.grey.shade600,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<Session> _getFilteredSessions(List<Session> allSessions) {
+    List<Session> sessions = allSessions;
+    
+    // Filter by tab
+    if (_selectedTab == 'enrolled') {
+      sessions = sessions.where((session) => 
+        session.enrolledStudentId == widget.studentId
+      ).toList();
+    } else {
+      sessions = sessions.where((session) => 
+        session.isAvailable
+      ).toList();
     }
+    
+    // Filter by category
+    if (_selectedCategory != 'All') {
+      sessions = sessions.where((session) => 
+        session.category == _selectedCategory
+      ).toList();
+    }
+    
+    // Filter by search query
+    if (_searchController.text.isNotEmpty) {
+      final query = _searchController.text.toLowerCase();
+      sessions = sessions.where((session) =>
+        session.title.toLowerCase().contains(query) ||
+        session.category.toLowerCase().contains(query) ||
+        session.instructor.toLowerCase().contains(query)
+      ).toList();
+    }
+    
+    return sessions;
+  }
 
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: sessionsToShow.length,
-      itemBuilder: (context, index) {
-        final session = sessionsToShow[index];
-        return SessionCard(
-          session: session,
-          showEnrollButton: _selectedTab == 'available',
-          onEnroll: _selectedTab == 'available' 
-              ? () => _enrollInSession(session) 
-              : null,
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    
+    switch (index) {
+      case 0: // Home
+        break;
+      case 1: // Explore
+        setState(() {
+          _selectedTab = 'available';
+        });
+        break;
+      case 2: // Bookings
+        Navigator.pushNamed(context, '/my-bookings');
+        break;
+      case 3: // Profile
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const StudentProfileScreen(),
+          ),
         );
-      },
-    );
+        break;
+    }
   }
 
-  void _showSuccessSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
+  Future<void> _enrollInSession(Session session) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AdvancedBookingScreen(
+          session: session,
+          studentId: widget.studentId,
+          studentName: widget.studentName,
+        ),
+      ),
+    );
+    
+    if (result == true) {
+      context.read<SessionViewModel>().loadSessions();
+    }
+  }
+
+  void _showSessionDetails(Session session) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.7,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Handle
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              
+              // Session Image
+              if (session.image.isNotEmpty)
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.network(
+                    session.image,
+                    width: double.infinity,
+                    height: 200,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              
+              const SizedBox(height: 20),
+              
+              // Title
+              Text(
+                session.title,
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              
+              const SizedBox(height: 8),
+              
+              // Instructor
+              Text(
+                'by ${session.instructor}',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+              
+              const SizedBox(height: 16),
+              
+              // Details
+              _buildDetailRow(Icons.category, 'Category', session.category),
+              _buildDetailRow(Icons.access_time, 'Duration', '${session.durationHours} hours'),
+              _buildDetailRow(Icons.calendar_today, 'Date', _formatDate(session.startDate)),
+              _buildDetailRow(Icons.attach_money, 'Price', '\$${session.price}'),
+              
+              const Spacer(),
+              
+              // Action Button
+              if (session.isAvailable)
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _enrollInSession(session);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF667eea),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'Enroll Now',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  void _showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-        behavior: SnackBarBehavior.floating,
+  Widget _buildDetailRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.grey.shade600, size: 20),
+          const SizedBox(width: 12),
+          Text(
+            '$label: ',
+            style: TextStyle(
+              color: Colors.grey.shade600,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
       ),
     );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
   }
 }

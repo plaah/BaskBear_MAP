@@ -6,17 +6,43 @@ class BookingViewModel with ChangeNotifier {
   final BookingService _bookingService = BookingService();
   List<BookingModel> _bookings = [];
   BookingModel? _selectedBooking;
+  bool _isLoading = false;
 
   List<BookingModel> get bookings => _bookings;
   BookingModel? get selectedBooking => _selectedBooking;
+  bool get isLoading => _isLoading;
 
   // Fetch all bookings for a user
   Future<void> fetchBookingsByUserId(String userId) async {
     try {
+      _isLoading = true;
+      notifyListeners();
+      
       _bookings = await _bookingService.getBookingsByUserId(userId);
+      
+      _isLoading = false;
       notifyListeners();
     } catch (e) {
+      _isLoading = false;
+      notifyListeners();
       throw Exception('Failed to fetch bookings: $e');
+    }
+  }
+
+  // Fetch all bookings for an instructor
+  Future<void> loadInstructorBookings(String instructorId) async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+      
+      _bookings = await _bookingService.getBookingsByInstructorId(instructorId);
+      
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      throw Exception('Failed to fetch instructor bookings: $e');
     }
   }
 

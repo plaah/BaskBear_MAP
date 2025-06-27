@@ -4,6 +4,7 @@ import 'firebase_options.dart';
 import 'package:skillswap/views/onboarding/splash_screen.dart';
 import 'package:skillswap/viewmodels/auth_view_model.dart';
 import 'package:skillswap/viewmodels/session_view_model.dart';
+import 'package:skillswap/viewmodels/booking_view_model.dart';
 import 'package:skillswap/services/auth_service.dart';
 import 'package:provider/provider.dart';
 import 'package:skillswap/viewmodels/instructor_view_model.dart';
@@ -25,7 +26,10 @@ class MyApp extends StatelessWidget {
           create: (_) => AuthViewModel(AuthService()),
         ),
         ChangeNotifierProvider(
-          create: (_) => SessionViewModel(), // Remove the parameter
+          create: (_) => SessionViewModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => BookingViewModel(),
         ),
         ChangeNotifierProvider(
           create: (_) => InstructorViewModel(),
