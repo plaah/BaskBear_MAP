@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../viewmodels/session_view_model.dart';
 import '../../models/session_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../bookings/booking_screen.dart';
 
 class SessionListScreen extends StatefulWidget {
   const SessionListScreen({super.key});
@@ -27,7 +29,7 @@ class _SessionListScreenState extends State<SessionListScreen> {
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: const Text(
-          'My Courses',
+          'Available Sessions',
           style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5),
         ),
         backgroundColor: const Color.fromARGB(34, 70, 158, 241),
@@ -48,14 +50,20 @@ class _SessionListScreenState extends State<SessionListScreen> {
         ),
         child: Consumer<SessionViewModel>(
           builder: (context, viewModel, _) {
-            if (viewModel.sessions.isEmpty && !viewModel.isLoading) {
+            // FILTER: hanya sesi yang available
+            final availableSessions = viewModel.sessions.where((session) =>
+              session.isBooked == false &&
+              session.status == 'scheduled' &&
+              session.enrolledStudentId == null
+            ).toList();
+            if (availableSessions.isEmpty && !viewModel.isLoading) {
               return _buildEmptyState();
             }
             return ListView.builder(
               padding: const EdgeInsets.fromLTRB(20, 100, 20, 20),
-              itemCount: viewModel.sessions.length,
+              itemCount: availableSessions.length,
               itemBuilder: (context, index) {
-                final session = viewModel.sessions[index];
+                final session = availableSessions[index];
                 return _buildSessionCard(session, index, viewModel);
               },
             );
@@ -195,6 +203,28 @@ class _SessionListScreenState extends State<SessionListScreen> {
                   colors: [Color(0xFF5B81F7), Color(0xFFF76B6B)],
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
+                ),
+              ),
+            ),
+            // Tombol Book
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                    minimumSize: const Size(double.infinity, 45),
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => BookingScreen(sessionId: session.id),
+                      ),
+                    );
+                  },
+                  child: const Text('Book Session', style: TextStyle(fontSize: 16)),
                 ),
               ),
             ),
