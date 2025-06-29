@@ -7,11 +7,11 @@ class SessionCard extends StatelessWidget {
   final VoidCallback? onEnroll;
 
   const SessionCard({
-    Key? key,
+    super.key,
     required this.session,
     this.showEnrollButton = false,
     this.onEnroll,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -42,12 +42,13 @@ class SessionCard extends StatelessWidget {
                     width: 80,
                     height: 80,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      width: 80,
-                      height: 80,
-                      color: Colors.grey[300],
-                      child: const Icon(Icons.image_not_supported),
-                    ),
+                    errorBuilder:
+                        (context, error, stackTrace) => Container(
+                          width: 80,
+                          height: 80,
+                          color: Colors.grey[300],
+                          child: const Icon(Icons.image_not_supported),
+                        ),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -99,10 +100,7 @@ class SessionCard extends StatelessWidget {
               const SizedBox(height: 12),
               Text(
                 session.description,
-                style: TextStyle(
-                  color: Colors.grey[700],
-                  fontSize: 14,
-                ),
+                style: TextStyle(color: Colors.grey[700], fontSize: 14),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -128,7 +126,10 @@ class SessionCard extends StatelessWidget {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
                     ),
                     child: const Text('Enroll'),
                   ),

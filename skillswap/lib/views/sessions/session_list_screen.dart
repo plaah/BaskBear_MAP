@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../viewmodels/session_view_model.dart';
 import '../../models/session_model.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import '../bookings/booking_screen.dart';
 
 class SessionListScreen extends StatefulWidget {
@@ -51,11 +50,15 @@ class _SessionListScreenState extends State<SessionListScreen> {
         child: Consumer<SessionViewModel>(
           builder: (context, viewModel, _) {
             // FILTER: hanya sesi yang available
-            final availableSessions = viewModel.sessions.where((session) =>
-              session.isBooked == false &&
-              session.status == 'scheduled' &&
-              session.enrolledStudentId == null
-            ).toList();
+            final availableSessions =
+                viewModel.sessions
+                    .where(
+                      (session) =>
+                          session.isBooked == false &&
+                          session.status == 'scheduled' &&
+                          session.enrolledStudentId == null,
+                    )
+                    .toList();
             if (availableSessions.isEmpty && !viewModel.isLoading) {
               return _buildEmptyState();
             }
@@ -208,7 +211,10 @@ class _SessionListScreenState extends State<SessionListScreen> {
             ),
             // Tombol Book
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
+              padding: const EdgeInsets.symmetric(
+                vertical: 12.0,
+                horizontal: 24.0,
+              ),
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -224,7 +230,10 @@ class _SessionListScreenState extends State<SessionListScreen> {
                       ),
                     );
                   },
-                  child: const Text('Book Session', style: TextStyle(fontSize: 16)),
+                  child: const Text(
+                    'Book Session',
+                    style: TextStyle(fontSize: 16),
+                  ),
                 ),
               ),
             ),

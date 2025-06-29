@@ -224,7 +224,7 @@ class _InstructorProfileScreenState extends State<InstructorProfileScreen> {
                                     (cert) => Chip(
                                       label: Text(
                                         cert.length > 30
-                                            ? cert.substring(0, 30) + '...'
+                                            ? '${cert.substring(0, 30)}...'
                                             : cert,
                                         style: const TextStyle(
                                           color: Colors.blueAccent,
@@ -475,7 +475,7 @@ class _InstructorProfileScreenState extends State<InstructorProfileScreen> {
                                   (cert) => Chip(
                                     label: Text(
                                       cert.length > 30
-                                          ? cert.substring(0, 30) + '...'
+                                          ? '${cert.substring(0, 30)}...'
                                           : cert,
                                     ),
                                     onDeleted: () {
