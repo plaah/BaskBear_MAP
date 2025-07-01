@@ -8,6 +8,7 @@ import 'package:skillswap/viewmodels/booking_view_model.dart';
 import 'package:skillswap/services/auth_service.dart';
 import 'package:provider/provider.dart';
 import 'package:skillswap/viewmodels/instructor_view_model.dart';
+import 'package:skillswap/viewmodels/notification_view_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,18 +23,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => AuthViewModel(AuthService())),
+        ChangeNotifierProvider(create: (_) => SessionViewModel()),
+        ChangeNotifierProvider(create: (_) => BookingViewModel()),
+        ChangeNotifierProvider(create: (_) => InstructorViewModel()),
         ChangeNotifierProvider(
-          create: (_) => AuthViewModel(AuthService()),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => SessionViewModel(),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => BookingViewModel(),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => InstructorViewModel(),
-        ),
+          create: (_) => NotificationViewModel(),
+        ), // <-- ADD THIS LINE
       ],
       child: MaterialApp(
         title: 'SkillSwap',

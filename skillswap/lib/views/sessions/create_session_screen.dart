@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import '../../viewmodels/session_view_model.dart';
-import '../../widgets/empty_state.dart';
 
 class CreateSessionScreen extends StatefulWidget {
   const CreateSessionScreen({super.key});
@@ -107,13 +105,13 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Basic Information
               _buildSectionTitle('Basic Information'),
               const SizedBox(height: 16),
-              
+
               _buildTextField(
                 controller: _titleController,
                 label: 'Session Title',
@@ -126,9 +124,9 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
                   return null;
                 },
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               _buildTextField(
                 controller: _descriptionController,
                 label: 'Description',
@@ -142,9 +140,9 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
                   return null;
                 },
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Category and Type
               Row(
                 children: [
@@ -174,31 +172,27 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Date and Time
               _buildSectionTitle('Schedule'),
               const SizedBox(height: 16),
-              
+
               Row(
                 children: [
-                  Expanded(
-                    child: _buildDateField(),
-                  ),
+                  Expanded(child: _buildDateField()),
                   const SizedBox(width: 16),
-                  Expanded(
-                    child: _buildTimeField(),
-                  ),
+                  Expanded(child: _buildTimeField()),
                 ],
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Session Details
               _buildSectionTitle('Session Details'),
               const SizedBox(height: 16),
-              
+
               Row(
                 children: [
                   Expanded(
@@ -240,9 +234,9 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Location or Meeting URL
               if (_isOnline)
                 _buildTextField(
@@ -270,9 +264,9 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
                     return null;
                   },
                 ),
-              
+
               const SizedBox(height: 32),
-              
+
               // Create Button
               SizedBox(
                 width: double.infinity,
@@ -286,15 +280,16 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text(
-                          'Create Session',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
+                  child:
+                      _isLoading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : const Text(
+                            'Create Session',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                        ),
                 ),
               ),
             ],
@@ -363,12 +358,10 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
   }) {
     return DropdownButtonFormField<String>(
       value: value,
-      items: items.map((String item) {
-        return DropdownMenuItem<String>(
-          value: item,
-          child: Text(item),
-        );
-      }).toList(),
+      items:
+          items.map((String item) {
+            return DropdownMenuItem<String>(value: item, child: Text(item));
+          }).toList(),
       onChanged: onChanged,
       decoration: InputDecoration(
         labelText: label,
@@ -414,10 +407,7 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
           Expanded(
             child: Text(
               label,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.black87,
-              ),
+              style: const TextStyle(fontSize: 16, color: Colors.black87),
             ),
           ),
           Switch(
@@ -450,17 +440,11 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
                 children: [
                   const Text(
                     'Date',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey,
-                    ),
+                    style: TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                   Text(
                     '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.black87,
-                    ),
+                    style: const TextStyle(fontSize: 16, color: Colors.black87),
                   ),
                 ],
               ),
@@ -491,17 +475,11 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
                 children: [
                   const Text(
                     'Time',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey,
-                    ),
+                    style: TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                   Text(
                     _selectedTime.format(context),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.black87,
-                    ),
+                    style: const TextStyle(fontSize: 16, color: Colors.black87),
                   ),
                 ],
               ),
@@ -521,15 +499,13 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xFF667eea),
-            ),
+            colorScheme: const ColorScheme.light(primary: Color(0xFF667eea)),
           ),
           child: child!,
         );
       },
     );
-    
+
     if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;
@@ -544,15 +520,13 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xFF667eea),
-            ),
+            colorScheme: const ColorScheme.light(primary: Color(0xFF667eea)),
           ),
           child: child!,
         );
       },
     );
-    
+
     if (picked != null && picked != _selectedTime) {
       setState(() {
         _selectedTime = picked;

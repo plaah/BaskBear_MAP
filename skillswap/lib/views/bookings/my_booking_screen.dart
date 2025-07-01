@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../models/booking_model.dart';
 import '../../viewmodels/booking_view_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -43,7 +42,9 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
               final booking = viewModel.bookings[index];
               return ListTile(
                 title: Text('Booking ID: ${booking.id}'),
-                subtitle: Text('Status: ${booking.status}, Payment: ${booking.paymentStatus ? 'Paid' : 'Unpaid'}'),
+                subtitle: Text(
+                  'Status: ${booking.status}, Payment: ${booking.paymentStatus ? 'Paid' : 'Unpaid'}',
+                ),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -51,7 +52,10 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
                       icon: const Icon(Icons.edit),
                       onPressed: () async {
                         // Example: Update booking status
-                        await _viewModel.updateBookingStatus(booking.id, 'confirmed');
+                        await _viewModel.updateBookingStatus(
+                          booking.id,
+                          'confirmed',
+                        );
                       },
                     ),
                     IconButton(

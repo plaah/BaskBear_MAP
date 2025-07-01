@@ -1,197 +1,264 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:skillswap/views/auth/login_screen.dart';
-import 'package:skillswap/firebase_options.dart'; // Import the provided Firebase options
+import '../../viewmodels/notification_view_model.dart';
+import '../bookings/instructor_bookings_screen.dart';
 
-class NotificationScreen extends StatelessWidget {
-  const NotificationScreen({super.key});
-
-  // Initialize Firebase if not already initialized
-  Future<void> _initializeFirebase() async {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-  }
+class NotificationScreen extends StatefulWidget {
+  const NotificationScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    // Ensure Firebase is initialized
-    return FutureBuilder(
-      future: _initializeFirebase(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-        if (snapshot.hasError) {
-          return Scaffold(
-            body: Center(
-              child: Text('Error initializing Firebase: ${snapshot.error}'),
-            ),
-          );
-        }
-        // Firebase is initialized, now check authentication state
-        return StreamBuilder<User?>(
-          stream: FirebaseAuth.instance.authStateChanges(),
-          builder: (context, authSnapshot) {
-            if (authSnapshot.connectionState == ConnectionState.waiting) {
-              return const Scaffold(
-                body: Center(child: CircularProgressIndicator()),
-              );
-            }
-            if (!authSnapshot.hasData) {
-              // User is not authenticated, redirect to login screen
-              return const LoginScreen();
-            }
-            // User is authenticated, display the notification screen
-            return Scaffold(
-              appBar: AppBar(
-                title: const Text('Notifications'),
-                backgroundColor: const Color.fromARGB(255, 2, 56, 131),
-                foregroundColor: Colors.white,
-              ),
-              body: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Color.fromARGB(255, 204, 204, 253),
-                      Color.fromARGB(255, 252, 253, 255),
-                      Color.fromARGB(255, 206, 239, 255),
-                    ],
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Recent Updates',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(221, 0, 0, 0),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Expanded(
-                        child: ListView(
-                          children: const [
-                            // Placeholder for notification entries
-                            // Replace with actual data from Firestore or FCM
-                            NotificationEntry(
-                              title: 'New Student Enrollment',
-                              message:
-                                  'John Doe has enrolled in your Mathematics course.',
-                              time: '10 minutes ago',
-                              icon: Icons.person_add,
-                              iconColor: Color(0xFFF57C00), // Warm Orange
-                            ),
-                            NotificationEntry(
-                              title: 'Course Update',
-                              message:
-                                  'Your Physics course schedule has been updated.',
-                              time: '2 hours ago',
-                              icon: Icons.update,
-                              iconColor: Color(0xFF1976D2), // Bright Blue
-                            ),
-                            NotificationEntry(
-                              title: 'New Student Enrollment',
-                              message:
-                                  'Jane Smith has enrolled in your Programming course.',
-                              time: '1 day ago',
-                              icon: Icons.person_add,
-                              iconColor: Color(0xFFF57C00), // Warm Orange
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
+  State<NotificationScreen> createState() => _NotificationScreenState();
 }
 
-// Widget to display individual notification entries
-class NotificationEntry extends StatelessWidget {
-  final String title;
-  final String message;
-  final String time;
-  final IconData icon;
-  final Color iconColor;
-
-  const NotificationEntry({
-    super.key,
-    required this.title,
-    required this.message,
-    required this.time,
-    required this.icon,
-    required this.iconColor,
-  });
+class _NotificationScreenState extends State<NotificationScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        final viewModel = Provider.of<NotificationViewModel>(
+          context,
+          listen: false,
+        );
+        viewModel.fetchNotifications(user.uid);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                color: iconColor.withOpacity(0.2),
-                shape: BoxShape.circle,
-              ),
-              padding: const EdgeInsets.all(10),
-              child: Icon(icon, color: iconColor, size: 24),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Booking Requests'),
+        centerTitle: true,
+        backgroundColor: Colors.orangeAccent,
+        actions: [
+          Consumer<NotificationViewModel>(
+            builder: (context, viewModel, child) {
+              final unreadCount =
+                  viewModel.notifications.where((n) => !n.isRead).length;
+              if (unreadCount > 0) {
+                return Padding(
+                  padding: const EdgeInsets.only(right: 16.0),
+                  child: Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        '$unreadCount',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }
+              return const SizedBox.shrink();
+            },
+          ),
+        ],
+      ),
+      body: Consumer<NotificationViewModel>(
+        builder: (context, viewModel, child) {
+          if (viewModel.loading) {
+            return const Center(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 255, 255, 255),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    message,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Color.fromARGB(221, 255, 255, 255),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    time,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: const Color.fromARGB(255, 232, 232, 232),
-                    ),
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Loading booking requests...'),
+                ],
+              ),
+            );
+          }
+
+          if (viewModel.error != null) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                  const SizedBox(height: 16),
+                  Text('Error: ${viewModel.error}'),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      final user = FirebaseAuth.instance.currentUser;
+                      if (user != null) {
+                        viewModel.fetchNotifications(user.uid);
+                      }
+                    },
+                    child: const Text('Retry'),
                   ),
                 ],
               ),
+            );
+          }
+
+          if (viewModel.notifications.isEmpty) {
+            return const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.notifications_none, size: 64, color: Colors.grey),
+                  SizedBox(height: 16),
+                  Text(
+                    'No booking requests',
+                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'New student bookings will appear here',
+                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return RefreshIndicator(
+            onRefresh: () async {
+              final user = FirebaseAuth.instance.currentUser;
+              if (user != null) {
+                await viewModel.fetchNotifications(user.uid);
+              }
+            },
+            child: ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: viewModel.notifications.length,
+              itemBuilder: (context, index) {
+                final notification = viewModel.notifications[index];
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  elevation: notification.isRead ? 1 : 3,
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.all(16),
+                    leading: CircleAvatar(
+                      backgroundColor:
+                          notification.isRead
+                              ? Colors.grey.shade300
+                              : Colors.orangeAccent,
+                      child: Icon(
+                        notification.isRead ? Icons.book_outlined : Icons.book,
+                        color: notification.isRead ? Colors.grey : Colors.white,
+                      ),
+                    ),
+                    title: Text(
+                      '${notification.userName} wants to book a session',
+                      style: TextStyle(
+                        fontWeight:
+                            notification.isRead
+                                ? FontWeight.normal
+                                : FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 4),
+                        const Text('New booking request'),
+                        const SizedBox(height: 4),
+                        Text(
+                          _formatDateTime(notification.createdAt),
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                    trailing: PopupMenuButton(
+                      itemBuilder:
+                          (context) => [
+                            PopupMenuItem(
+                              value: 'mark_read',
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    notification.isRead
+                                        ? Icons.mark_email_unread
+                                        : Icons.mark_email_read,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    notification.isRead
+                                        ? 'Mark as Unread'
+                                        : 'Mark as Read',
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuItem(
+                              value: 'delete',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.delete, color: Colors.red),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'Delete',
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                      onSelected: (value) async {
+                        if (value == 'mark_read') {
+                          await viewModel.markAsRead(notification.id);
+                        } else if (value == 'delete') {
+                          await viewModel.deleteNotification(notification.id);
+                        }
+                      },
+                    ),
+                    onTap: () async {
+                      // Mark as read when tapped
+                      if (!notification.isRead) {
+                        await viewModel.markAsRead(notification.id);
+                      }
+
+                      // Navigate to instructor bookings screen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) => const InstructorBookingsScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
+  }
+
+  String _formatDateTime(DateTime dateTime) {
+    final now = DateTime.now();
+    final difference = now.difference(dateTime);
+
+    if (difference.inDays > 0) {
+      return '${difference.inDays} day${difference.inDays > 1 ? 's' : ''} ago';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours} hour${difference.inHours > 1 ? 's' : ''} ago';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes} minute${difference.inMinutes > 1 ? 's' : ''} ago';
+    } else {
+      return 'Just now';
+    }
   }
 }
