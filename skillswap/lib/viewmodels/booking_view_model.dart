@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:skillswap/models/booking_model.dart';
 import 'package:skillswap/services/booking_service.dart';
+import 'package:skillswap/services/session_service.dart';
+import 'package:skillswap/models/session_model.dart';
+import 'package:collection/collection.dart';
 
 class BookingViewModel with ChangeNotifier {
   final BookingService _bookingService = BookingService();
+  final SessionService _sessionService = FirestoreSessionService();
   List<BookingModel> _bookings = [];
   BookingModel? _selectedBooking;
   bool _isLoading = false;
@@ -11,6 +15,7 @@ class BookingViewModel with ChangeNotifier {
   List<BookingModel> get bookings => _bookings;
   BookingModel? get selectedBooking => _selectedBooking;
   bool get isLoading => _isLoading;
+  String? get error => null;
 
   // Fetch all bookings for a user
   Future<void> fetchBookingsByUserId(String userId) async {
@@ -19,7 +24,21 @@ class BookingViewModel with ChangeNotifier {
       notifyListeners();
       
       _bookings = await _bookingService.getBookingsByUserId(userId);
-      
+      // Check and update isDone for each booking
+      for (var i = 0; i < _bookings.length; i++) {
+        final booking = _bookings[i];
+        // Fetch session details
+        final sessionList = await _sessionService.getSessions();
+        final session = sessionList.firstWhereOrNull((s) => s.id == booking.sessionId);
+        if (session != null && session.endDate != null) {
+          final now = DateTime.now();
+          if (now.isAfter(session.endDate!) && !booking.isDone) {
+            // Update isDone in Firestore and locally
+            await _bookingService.updateBookingFields(booking.id, {'isDone': true});
+            _bookings[i] = booking.copyWith(isDone: true);
+          }
+        }
+      }
       _isLoading = false;
       notifyListeners();
     } catch (e) {
@@ -104,5 +123,14 @@ class BookingViewModel with ChangeNotifier {
     } catch (e) {
       throw Exception('Failed to delete booking: $e');
     }
+  }
+
+  Future<void> fetchInstructorBookings(String instructorId) async {
+    await loadInstructorBookings(instructorId);
+  }
+
+  // Update arbitrary fields of a booking
+  Future<void> updateBookingFields(String bookingId, Map<String, dynamic> fields) async {
+    await _bookingService.updateBookingFields(bookingId, fields);
   }
 }

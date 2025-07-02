@@ -73,4 +73,30 @@ class BookingService {
       throw Exception('Failed to delete booking: $e');
     }
   }
+
+  // Update arbitrary fields of a booking
+  Future<void> updateBookingFields(String bookingId, Map<String, dynamic> fields) async {
+    try {
+      await _firestore.collection('bookings').doc(bookingId).update(fields);
+    } catch (e) {
+      throw Exception('Failed to update booking fields: $e');
+    }
+  }
+
+  // Update payment status by userId and sessionId
+  Future<void> updatePaymentStatusByUserAndSession(String userId, String sessionId, bool paymentStatus) async {
+    try {
+      final query = await _firestore
+        .collection('bookings')
+        .where('userId', isEqualTo: userId)
+        .where('sessionId', isEqualTo: sessionId)
+        .limit(1)
+        .get();
+      if (query.docs.isNotEmpty) {
+        await _firestore.collection('bookings').doc(query.docs.first.id).update({'paymentStatus': paymentStatus});
+      }
+    } catch (e) {
+      throw Exception('Failed to update payment status: $e');
+    }
+  }
 }
