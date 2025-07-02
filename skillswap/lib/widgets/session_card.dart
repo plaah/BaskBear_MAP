@@ -74,7 +74,7 @@ class SessionCard extends StatelessWidget {
                       Text(
                         'by ${session.instructor}',
                         style: const TextStyle(
-                          color: Color(0xFF333333), // Dark gray
+                          color: Color.fromARGB(255, 4, 0, 0), // Dark gray
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
@@ -105,7 +105,7 @@ class SessionCard extends StatelessWidget {
               Text(
                 session.description,
                 style: const TextStyle(
-                  color: Color(0xFF424242), // Medium dark gray
+                  color: Color.fromARGB(255, 0, 0, 0), // Medium dark gray
                   fontSize: 14,
                   height: 1.4,
                 ),
@@ -120,7 +120,7 @@ class SessionCard extends StatelessWidget {
                 Text(
                   'Start: ${_formatDate(session.startDate)}',
                   style: const TextStyle(
-                    color: Color(0xFF555555), // Dark gray
+                    color: Color.fromARGB(255, 0, 0, 0), // Dark gray
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                   ),
@@ -146,7 +146,7 @@ class SessionCard extends StatelessWidget {
                       'Enroll',
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFFFFFFFF), // Explicit white
+                        color: Color.fromARGB(255, 0, 0, 0), // Explicit white
                       ),
                     ),
                   ),

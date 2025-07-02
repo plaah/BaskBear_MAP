@@ -49,7 +49,7 @@ class CourseCard extends StatelessWidget {
         return [const Color(0xFF4facfe), const Color(0xFF00f2fe)];
       case 'business':
         return [
-          const Color.fromARGB(255, 255, 218, 167),
+          const Color.fromARGB(255, 121, 73, 4),
           const Color.fromARGB(255, 254, 166, 137),
         ];
       case 'marketing':
@@ -148,7 +148,7 @@ class CourseCard extends StatelessWidget {
                                 Text(
                                   session.category,
                                   style: TextStyle(
-                                    fontSize: 9,
+                                    fontSize: 15,
                                     fontWeight: FontWeight.w600,
                                     color: gradientColors.first,
                                   ),
@@ -163,7 +163,7 @@ class CourseCard extends StatelessWidget {
                       Text(
                         session.title,
                         style: const TextStyle(
-                          fontSize: 14,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                           height: 1.1,
@@ -183,7 +183,7 @@ class CourseCard extends StatelessWidget {
                                   ? session.instructor[0].toUpperCase()
                                   : 'I',
                               style: TextStyle(
-                                fontSize: 9,
+                                fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 color: gradientColors.first,
                               ),
@@ -194,7 +194,7 @@ class CourseCard extends StatelessWidget {
                             child: Text(
                               session.instructor,
                               style: const TextStyle(
-                                fontSize: 11,
+                                fontSize: 15,
                                 color: Colors.white70,
                               ),
                               maxLines: 1,

@@ -158,7 +158,7 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
                       },
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 7),
                   Expanded(
                     child: _buildSwitchField(
                       label: 'Online Session',
@@ -173,7 +173,7 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
                 ],
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 15),
 
               // Date and Time
               _buildSectionTitle('Schedule'),

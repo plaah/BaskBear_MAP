@@ -1,6 +1,9 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:skillswap/views/bookings/my_booking_screen.dart';
 import '../../models/session_model.dart';
 import '../../viewmodels/session_view_model.dart';
 import '../../widgets/course_card.dart';
@@ -53,7 +56,8 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: const Color.fromARGB(255, 245, 252, 255),
+
       body: CustomScrollView(
         slivers: [
           _buildAppBar(),
@@ -143,7 +147,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+              colors: [Color(0xFF66A4EA), Color(0xFF66A4EA), Color(0xFFA5E7FF)],
             ),
           ),
           child: SafeArea(
@@ -152,17 +156,28 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  CircleAvatar(
-                    radius: 22,
-                    backgroundColor: Colors.white.withOpacity(0.2),
-                    child: Text(
-                      widget.studentName.isNotEmpty
-                          ? widget.studentName[0].toUpperCase()
-                          : 'S',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
+                  // Clickable profile avatar
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const StudentProfileScreen(),
+                        ),
+                      );
+                    },
+                    child: CircleAvatar(
+                      radius: 22,
+                      backgroundColor: Colors.white.withOpacity(0.2),
+                      child: Text(
+                        widget.studentName.isNotEmpty
+                            ? widget.studentName[0].toUpperCase()
+                            : 'S',
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
                       ),
                     ),
                   ),
@@ -174,7 +189,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                       children: [
                         Text(
                           'Welcome',
-                          style: const TextStyle(
+                          style: GoogleFonts.poppins(
                             color: Colors.white,
                             fontSize: 19,
                             fontWeight: FontWeight.bold,
@@ -182,9 +197,12 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                           ),
                         ),
                         const SizedBox(height: 2),
-                        const Text(
+                        Text(
                           'Ready to learn something new?',
-                          style: TextStyle(color: Colors.white70, fontSize: 14),
+                          style: GoogleFonts.poppins(
+                            color: Colors.white70,
+                            fontSize: 14,
+                          ),
                         ),
                       ],
                     ),
@@ -280,7 +298,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: const Color.fromARGB(255, 255, 255, 255).withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -300,7 +318,8 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
     return Expanded(
       child: GestureDetector(
         onTap: () => setState(() => _selectedTab = tabKey),
-        child: Container(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(vertical: 14),
           decoration: BoxDecoration(
             color: isSelected ? const Color(0xFF667eea) : Colors.transparent,
@@ -309,7 +328,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
           child: Text(
             title,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: GoogleFonts.poppins(
               color: isSelected ? Colors.white : Colors.grey.shade600,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               fontSize: 15,
@@ -356,7 +375,8 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color:
@@ -375,7 +395,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
           const SizedBox(height: 2),
           Text(
             label,
-            style: TextStyle(
+            style: GoogleFonts.poppins(
               fontSize: 12,
               color:
                   isSelected ? const Color(0xFF667eea) : Colors.grey.shade600,
@@ -432,8 +452,10 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
         });
         break;
       case 2:
-        Navigator.pushNamed(context, '/my-bookings');
-        break;
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const MyBookingScreen()),
+        );
       case 3:
         Navigator.push(
           context,
@@ -466,119 +488,183 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder:
-          (context) => Container(
-            height: MediaQuery.of(context).size.height * 0.7,
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 40,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
+          (context) => ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.white.withOpacity(0.88),
+                      Colors.blue.shade50.withOpacity(0.85),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(28),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.blueGrey.withOpacity(0.15),
+                      blurRadius: 30,
+                      offset: const Offset(0, -6),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  if (session.image.isNotEmpty)
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.network(
-                        session.image,
-                        width: double.infinity,
-                        height: 200,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  const SizedBox(height: 20),
-                  Text(
-                    session.title,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'by ${session.instructor}',
-                    style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildDetailRow(Icons.category, 'Category', session.category),
-                  _buildDetailRow(
-                    Icons.access_time,
-                    'Duration',
-                    '${session.durationHours} hours',
-                  ),
-                  _buildDetailRow(
-                    Icons.calendar_today,
-                    'Date',
-                    _formatDate(session.startDate),
-                  ),
-                  _buildDetailRow(
-                    Icons.attach_money,
-                    'Price',
-                    '\$${session.price}',
-                  ),
-                  const Spacer(),
-                  if (session.isAvailable)
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          _enrollInSession(session);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF667eea),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text(
-                          'Enroll Now',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
+                  ],
+                ),
+                padding: const EdgeInsets.all(24),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 5,
+                        margin: const EdgeInsets.only(bottom: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade300,
+                          borderRadius: BorderRadius.circular(2.5),
                         ),
                       ),
-                    ),
-                ],
+                      if (session.image.isNotEmpty)
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(18),
+                          child: Image.network(
+                            session.image,
+                            width: double.infinity,
+                            height: 170,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      const SizedBox(height: 18),
+                      Text(
+                        session.title,
+                        style: GoogleFonts.poppins(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.2,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircleAvatar(
+                            radius: 16,
+                            backgroundColor: Colors.blue.shade100,
+                            child: Icon(
+                              Icons.person,
+                              color: Colors.blue.shade700,
+                              size: 18,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            session.instructor,
+                            style: GoogleFonts.poppins(
+                              fontSize: 15,
+                              color: Colors.blueGrey.shade600,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      _modernDetailRow(
+                        Icons.category,
+                        'Category',
+                        session.category,
+                      ),
+                      _modernDetailRow(
+                        Icons.access_time,
+                        'Duration',
+                        '${session.durationHours} hours',
+                      ),
+                      _modernDetailRow(
+                        Icons.calendar_today,
+                        'Date',
+                        _formatDate(session.startDate),
+                      ),
+                      _modernDetailRow(
+                        Icons.attach_money,
+                        'Price',
+                        '\$${session.price}',
+                      ),
+                      const SizedBox(height: 28),
+                      if (session.isAvailable)
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            icon: const Icon(Icons.check_circle_outline),
+                            label: const Text(
+                              'Enroll Now',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF667eea),
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(18),
+                              ),
+                              elevation: 2,
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context);
+                              _enrollInSession(session);
+                            },
+                          ),
+                        ),
+                      const SizedBox(height: 10),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
     );
   }
 
-  Widget _buildDetailRow(IconData icon, String label, String value) {
+  Widget _modernDetailRow(IconData icon, String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
-          Icon(icon, color: Colors.grey.shade600, size: 20),
-          const SizedBox(width: 12),
+          Container(
+            padding: const EdgeInsets.all(7),
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(255, 163, 211, 255),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              icon,
+              color: const Color.fromARGB(255, 9, 97, 169),
+              size: 18,
+            ),
+          ),
+          const SizedBox(width: 14),
           Text(
             '$label: ',
-            style: TextStyle(
-              color: Colors.grey.shade600,
+            style: GoogleFonts.poppins(
+              color: const Color.fromARGB(255, 3, 59, 87),
               fontWeight: FontWeight.w500,
+              fontSize: 15,
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(fontWeight: FontWeight.w600),
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.w600,
+                fontSize: 15,
+                color: Colors.black87,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],

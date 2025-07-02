@@ -35,49 +35,59 @@ class _BookingScreenState extends State<BookingScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: _currentUser == null
-            ? const Center(child: Text('You must be logged in to book a session.'))
-            : Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    TextFormField(
-                      controller: _additionalNotesController,
-                      decoration: const InputDecoration(
-                        labelText: 'Additional Notes',
-                        border: OutlineInputBorder(),
+        child:
+            _currentUser == null
+                ? const Center(
+                  child: Text('You must be logged in to book a session.'),
+                )
+                : Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: _additionalNotesController,
+                        decoration: const InputDecoration(
+                          labelText: 'Additional Notes',
+                          border: OutlineInputBorder(),
+                        ),
+                        maxLines: 3,
                       ),
-                      maxLines: 3,
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () async {
-                        if (_formKey.currentState!.validate()) {
-                          final booking = BookingModel(
-                            id: DateTime.now().microsecondsSinceEpoch.toString(),
-                            userId: _currentUser!.uid,
-                            sessionId: widget.sessionId,
-                            bookingDate: DateTime.now(),
-                            status: 'pending',
-                            paymentStatus: false,
-                            additionalNotes: _additionalNotesController.text,
-                          );
-                          await _viewModel.createBooking(booking);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Booking created successfully!')),
-                          );
-                          Navigator.pop(context);
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueAccent,
-                        minimumSize: const Size(double.infinity, 50),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () async {
+                          if (_formKey.currentState!.validate()) {
+                            final booking = BookingModel(
+                              id:
+                                  DateTime.now().microsecondsSinceEpoch
+                                      .toString(),
+                              userId: _currentUser!.uid,
+                              sessionId: widget.sessionId,
+                              bookingDate: DateTime.now(),
+                              status: 'pending',
+                              paymentStatus: false,
+                              additionalNotes: _additionalNotesController.text,
+                            );
+                            await _viewModel.createBooking(booking);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Booking created successfully!'),
+                              ),
+                            );
+                            Navigator.pop(context);
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blueAccent,
+                          minimumSize: const Size(double.infinity, 50),
+                        ),
+                        child: const Text(
+                          'Book Session',
+                          style: TextStyle(fontSize: 18),
+                        ),
                       ),
-                      child: const Text('Book Session', style: TextStyle(fontSize: 18)),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
       ),
     );
   }
