@@ -6,13 +6,13 @@ import '../services/review_service.dart';
 class ReviewViewModel extends ChangeNotifier {
   final ReviewService _reviewService = ReviewService();
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  
+
   bool _isLoading = false;
   String? _error;
   List<ReviewModel> _reviews = [];
   bool _canReview = false;
   bool _hasReviewed = false;
-  
+
   bool get isLoading => _isLoading;
   String? get error => _error;
   List<ReviewModel> get reviews => _reviews;
@@ -46,9 +46,10 @@ class ReviewViewModel extends ChangeNotifier {
       }
 
       // Get student info (you might want to fetch this from Firestore)
-      String studentName = currentUser.displayName ?? 
-                          currentUser.email?.split('@')[0] ?? 
-                          'Unknown Student';
+      String studentName =
+          currentUser.displayName ??
+          currentUser.email?.split('@')[0] ??
+          'Unknown Student';
 
       final review = ReviewModel(
         id: '',
@@ -66,11 +67,10 @@ class ReviewViewModel extends ChangeNotifier {
       );
 
       await _reviewService.submitReview(review);
-      
+
       // Refresh the reviews list and review status
       await loadSessionReviews(sessionId);
       await checkReviewStatus(sessionId, currentUser.uid);
-      
     } catch (e) {
       _error = e.toString();
     } finally {
@@ -115,7 +115,10 @@ class ReviewViewModel extends ChangeNotifier {
   Future<void> checkReviewStatus(String sessionId, String studentId) async {
     try {
       _canReview = await _reviewService.canStudentReview(sessionId, studentId);
-      _hasReviewed = await _reviewService.hasStudentReviewed(sessionId, studentId);
+      _hasReviewed = await _reviewService.hasStudentReviewed(
+        sessionId,
+        studentId,
+      );
       notifyListeners();
     } catch (e) {
       _error = e.toString();
@@ -147,11 +150,10 @@ class ReviewViewModel extends ChangeNotifier {
       }
 
       await _reviewService.deleteReview(reviewId, currentUser.uid);
-      
+
       // Refresh the reviews list and review status
       await loadSessionReviews(sessionId);
       await checkReviewStatus(sessionId, currentUser.uid);
-      
     } catch (e) {
       _error = e.toString();
     } finally {
@@ -170,14 +172,14 @@ class ReviewViewModel extends ChangeNotifier {
   // Get rating distribution (1-5 stars)
   Map<int, int> get ratingDistribution {
     Map<int, int> distribution = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0};
-    
+
     for (ReviewModel review in _reviews) {
       int rating = review.rating.round();
       if (rating >= 1 && rating <= 5) {
         distribution[rating] = distribution[rating]! + 1;
       }
     }
-    
+
     return distribution;
   }
 
@@ -206,6 +208,8 @@ class ReviewViewModel extends ChangeNotifier {
   // Get recent reviews (last 30 days)
   List<ReviewModel> get recentReviews {
     DateTime thirtyDaysAgo = DateTime.now().subtract(const Duration(days: 30));
-    return _reviews.where((review) => review.createdAt.isAfter(thirtyDaysAgo)).toList();
+    return _reviews
+        .where((review) => review.createdAt.isAfter(thirtyDaysAgo))
+        .toList();
   }
 }

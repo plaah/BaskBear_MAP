@@ -19,9 +19,8 @@ class _MyBookingScreenState extends State<MyBookingScreen>
   late AnimationController _animationController;
   late AnimationController _pulseController;
   late Animation<double> _fadeAnimation;
-
-   late Animation<double> _pulseAnimation;
- final FirestoreSessionService _sessionService = FirestoreSessionService();
+  late Animation<double> _pulseAnimation;
+  final FirestoreSessionService _sessionService = FirestoreSessionService();
 
   @override
   void initState() {
@@ -463,12 +462,17 @@ class _MyBookingScreenState extends State<MyBookingScreen>
                         ),
                         const SizedBox(height: 20),
                         // Action Buttons
-                        Row(
+                        Wrap(
+                          spacing: 10,
+                          runSpacing: 8,
+                          crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
-
-                            if (booking.isDone) ...[
+                            if (booking.isDone)
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
                                 decoration: BoxDecoration(
                                   color: Colors.green.shade100,
                                   borderRadius: BorderRadius.circular(20),
@@ -481,96 +485,110 @@ class _MyBookingScreenState extends State<MyBookingScreen>
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 8),
-                              if (!booking.isReview)
-                                ElevatedButton.icon(
-                                  onPressed: () async {
-                                    final session = await _sessionService.getSessionById(booking.sessionId);
-                                    final result = await showDialog(
-                                      context: context,
-                                      builder: (context) => ChangeNotifierProvider(
-                                        create: (_) => ReviewViewModel(),
-                                        child: ReviewDialog(
-                                          sessionId: booking.sessionId,
-                                          instructorId: session?.instructorId ?? '',
-                                          sessionTitle: session?.title ?? 'Session',
-                                          instructorName: session?.instructor ?? 'Instructor',
+                            if (booking.isDone && !booking.isReview)
+                              ElevatedButton.icon(
+                                onPressed: () async {
+                                  final session = await _sessionService
+                                      .getSessionById(booking.sessionId);
+                                  final result = await showDialog(
+                                    context: context,
+                                    builder:
+                                        (context) => ChangeNotifierProvider(
+                                          create: (_) => ReviewViewModel(),
+                                          child: ReviewDialog(
+                                            sessionId: booking.sessionId,
+                                            instructorId:
+                                                session?.instructorId ?? '',
+                                            sessionTitle:
+                                                session?.title ?? 'Session',
+                                            instructorName:
+                                                session?.instructor ??
+                                                'Instructor',
+                                          ),
                                         ),
-                                      ),
+                                  );
+                                  if (result != null) {
+                                    // After review, update isReview
+                                    await _viewModel.updateBookingFields(
+                                      booking.id,
+                                      {'isReview': true},
                                     );
-                                    if (result != null) {
-                                      // After review, update isReview
-                                      await _viewModel.updateBookingFields(booking.id, {'isReview': true});
-                                      final user = FirebaseAuth.instance.currentUser;
-                                      if (user != null) {
-                                        await _viewModel.fetchBookingsByUserId(user.uid);
-                                      }
+                                    final user =
+                                        FirebaseAuth.instance.currentUser;
+                                    if (user != null) {
+                                      await _viewModel.fetchBookingsByUserId(
+                                        user.uid,
+                                      );
                                     }
-                                  },
-                                  icon: const Icon(Icons.rate_review, color: Colors.white, size: 18),
-                                  label: const Text('Write Review', style: TextStyle(color: Colors.white)),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.blue,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
+                                  }
+                                },
+                                icon: const Icon(
+                                  Icons.rate_review,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
+                                label: const Text(
+                                  'Write Review',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blue,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
                                 ),
-                            ],
-
-                            Expanded(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    colors: [
-                                      Color.fromARGB(255, 75, 111, 162),
-                                      Color(0xFF1565c0),
-                                    ],
-                                  ),
-                                  borderRadius: BorderRadius.circular(12),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color(
-                                        0xFF1565c0,
-                                      ).withOpacity(0.3),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 4),
-                                    ),
+                              ),
+                            Container(
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color.fromARGB(255, 75, 111, 162),
+                                    Color(0xFF1565c0),
                                   ],
                                 ),
-                                child: ElevatedButton.icon(
-                                  onPressed: () async {
-                                    await _showUpdateDialog(
-                                      booking.id,
-                                      booking.status,
-                                    );
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.transparent,
-                                    shadowColor: Colors.transparent,
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 12,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(
+                                      0xFF1565c0,
+                                    ).withOpacity(0.3),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
                                   ),
-                                  icon: const Icon(
-                                    Icons.edit,
+                                ],
+                              ),
+                              child: ElevatedButton.icon(
+                                onPressed: () async {
+                                  await _showUpdateDialog(
+                                    booking.id,
+                                    booking.status,
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  shadowColor: Colors.transparent,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                    horizontal: 16,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                icon: const Icon(
+                                  Icons.edit,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
+                                label: const Text(
+                                  'Update',
+                                  style: TextStyle(
                                     color: Colors.white,
-                                    size: 18,
-                                  ),
-                                  label: const Text(
-                                    'Update',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 12),
                             Container(
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
@@ -1244,4 +1262,4 @@ class _MyBookingScreenState extends State<MyBookingScreen>
       ),
     );
   }
-
+}

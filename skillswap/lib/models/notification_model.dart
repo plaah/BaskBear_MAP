@@ -41,4 +41,4 @@ class NotificationModel {
       'isRead': isRead,
     };
   }
-
+}

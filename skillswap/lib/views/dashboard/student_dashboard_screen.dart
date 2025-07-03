@@ -29,7 +29,6 @@ extension IterableExtension<T> on Iterable<T> {
   }
 }
 
-
 class StudentDashboardScreen extends StatefulWidget {
   final String studentId;
   final String studentName;
@@ -78,7 +77,6 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 245, 252, 255),
-
       body: CustomScrollView(
         slivers: [
           _buildAppBar(),
@@ -128,60 +126,82 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                   );
                 }
 
+                if (_selectedTab == 'enrolled') {
+                  final bookings = context.watch<BookingViewModel>().bookings;
+                  return SliverList(
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      final session = filteredSessions[index];
+                      final booking = IterableExtension(
+                        bookings,
+                      ).firstWhereOrNull((b) => b.sessionId == session.id);
 
-                return SliverList(
-                  delegate: SliverChildBuilderDelegate((context, index) {
-                    final session = filteredSessions[index];
-                    BookingModel? booking;
-                    if (_selectedTab == 'enrolled') {
-                      final bookings = context.watch<BookingViewModel>().bookings;
-                      // Explicitly use the extension from this file to resolve ambiguity
-                      booking = IterableExtension<BookingModel>(bookings).firstWhereOrNull((b) => b.sessionId == session.id);
                       return SessionCard(
                         session: session,
                         isDone: booking?.isDone ?? false,
                         isReviewed: booking?.isReview ?? false,
-                        onDone: (booking != null && !(booking.isDone))
-                          ? () async {
-                              final b = booking;
-                              if (b == null) return;
-                              await context.read<BookingViewModel>().updateBookingFields(b.id, {'isDone': true});
-                              final user = FirebaseAuth.instance.currentUser;
-                              if (user != null) {
-                                await context.read<BookingViewModel>().fetchBookingsByUserId(user.uid);
-                              }
-                              setState(() {});
-                            }
-                          : null,
-                        onReview: (booking != null && booking.isDone && !booking.isReview)
-                          ? () async {
-                              final b = booking;
-                              if (b == null) return;
-                              final result = await showDialog(
-                                context: context,
-                                builder: (context) => ChangeNotifierProvider(
-                                  create: (_) => ReviewViewModel(),
-                                  child: ReviewDialog(
-                                    sessionId: b.sessionId,
-                                    instructorId: session.instructorId,
-                                    sessionTitle: session.title,
-                                    instructorName: session.instructor,
-                                  ),
-                                ),
-                              );
-                              if (result != null) {
-                                await context.read<BookingViewModel>().updateBookingFields(b.id, {'isReview': true});
-                                final user = FirebaseAuth.instance.currentUser;
-                                if (user != null) {
-                                  await context.read<BookingViewModel>().fetchBookingsByUserId(user.uid);
+                        onDone:
+                            (booking != null && !(booking.isDone))
+                                ? () async {
+                                  final b = booking;
+                                  if (b == null) return;
+                                  await context
+                                      .read<BookingViewModel>()
+                                      .updateBookingFields(b.id, {
+                                        'isDone': true,
+                                      });
+                                  final user =
+                                      FirebaseAuth.instance.currentUser;
+                                  if (user != null) {
+                                    await context
+                                        .read<BookingViewModel>()
+                                        .fetchBookingsByUserId(user.uid);
+                                  }
+                                  setState(() {});
                                 }
-                              }
-                            }
-                          : null,
+                                : null,
+                        onReview:
+                            (booking != null &&
+                                    booking.isDone &&
+                                    !booking.isReview)
+                                ? () async {
+                                  final b = booking;
+                                  if (b == null) return;
+                                  final result = await showDialog(
+                                    context: context,
+                                    builder:
+                                        (context) => ChangeNotifierProvider(
+                                          create: (_) => ReviewViewModel(),
+                                          child: ReviewDialog(
+                                            sessionId: b.sessionId,
+                                            instructorId: session.instructorId,
+                                            sessionTitle: session.title,
+                                            instructorName: session.instructor,
+                                          ),
+                                        ),
+                                  );
+                                  if (result != null) {
+                                    await context
+                                        .read<BookingViewModel>()
+                                        .updateBookingFields(b.id, {
+                                          'isReview': true,
+                                        });
+                                    final user =
+                                        FirebaseAuth.instance.currentUser;
+                                    if (user != null) {
+                                      await context
+                                          .read<BookingViewModel>()
+                                          .fetchBookingsByUserId(user.uid);
+                                    }
+                                  }
+                                }
+                                : null,
                         showEnrollButton: false,
                       );
-                    }
+                    }, childCount: filteredSessions.length),
+                  );
+                }
 
+                // Available tab: use CourseCard in a grid
                 return SliverGrid(
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
@@ -191,43 +211,11 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                   ),
                   delegate: SliverChildBuilderDelegate((context, index) {
                     final session = filteredSessions[index];
-
                     return CourseCard(
                       session: session,
                       showEnrollButton: _selectedTab == 'available',
                       onEnroll: () => _enrollInSession(session),
-
-                      onTap: () => _showSessionDetails(session, booking),
-                      isDone: booking?.isDone ?? false,
-                      isReview: booking?.isReview ?? false,
-                      onReview: (booking != null && !booking.isReview)
-                        ? () async {
-                            final b = booking;
-                            if (b == null) return;
-                            final result = await showDialog(
-                              context: context,
-                              builder: (context) => ChangeNotifierProvider(
-                                create: (_) => ReviewViewModel(),
-                                child: ReviewDialog(
-                                  sessionId: b.sessionId,
-                                  instructorId: session.instructorId,
-                                  sessionTitle: session.title,
-                                  instructorName: session.instructor,
-                                ),
-                              ),
-                            );
-                            if (result != null) {
-                              await context.read<BookingViewModel>().updateBookingFields(b.id, {'isReview': true});
-                              final user = FirebaseAuth.instance.currentUser;
-                              if (user != null) {
-                                await context.read<BookingViewModel>().fetchBookingsByUserId(user.uid);
-                              }
-                            }
-                          }
-                        : null,
-
-                      onTap: () => _showSessionDetails(session),
-
+                      onTap: () => _showSessionDetails(session, null),
                     );
                   }, childCount: filteredSessions.length),
                 );
@@ -563,6 +551,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
           context,
           MaterialPageRoute(builder: (context) => const MyBookingScreen()),
         );
+        break;
       case 3:
         Navigator.push(
           context,
@@ -647,12 +636,8 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                       const SizedBox(height: 18),
                       Text(
                         session.title,
-
                         style: const TextStyle(
                           color: Colors.black87,
-
-                     
-
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 0.2,
@@ -733,10 +718,12 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                           ),
                         ),
                       const SizedBox(height: 10),
-
                       if (booking != null && booking.isDone) ...[
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.green.shade100,
                             borderRadius: BorderRadius.circular(20),
@@ -753,10 +740,42 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                         if (!booking.isReview)
                           ElevatedButton.icon(
                             onPressed: () async {
-                              // Show review dialog and update booking after review
+                              final result = await showDialog(
+                                context: context,
+                                builder:
+                                    (context) => ChangeNotifierProvider(
+                                      create: (_) => ReviewViewModel(),
+                                      child: ReviewDialog(
+                                        sessionId: booking.sessionId,
+                                        instructorId: session.instructorId,
+                                        sessionTitle: session.title,
+                                        instructorName: session.instructor,
+                                      ),
+                                    ),
+                              );
+                              if (result != null) {
+                                await context
+                                    .read<BookingViewModel>()
+                                    .updateBookingFields(booking.id, {
+                                      'isReview': true,
+                                    });
+                                final user = FirebaseAuth.instance.currentUser;
+                                if (user != null) {
+                                  await context
+                                      .read<BookingViewModel>()
+                                      .fetchBookingsByUserId(user.uid);
+                                }
+                              }
                             },
-                            icon: const Icon(Icons.rate_review, color: Colors.white, size: 18),
-                            label: const Text('Write Review', style: TextStyle(color: Colors.white)),
+                            icon: const Icon(
+                              Icons.rate_review,
+                              color: Colors.white,
+                              size: 18,
+                            ),
+                            label: const Text(
+                              'Write Review',
+                              style: TextStyle(color: Colors.white),
+                            ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blue,
                               shape: RoundedRectangleBorder(
@@ -765,7 +784,6 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                             ),
                           ),
                       ],
-
                     ],
                   ),
                 ),

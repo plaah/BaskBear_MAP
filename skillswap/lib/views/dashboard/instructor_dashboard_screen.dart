@@ -12,8 +12,7 @@ import '../bookings/instructor_bookings_screen.dart';
 
 import '../reviews/review_analysis_screen.dart';
 
-import '../earnings/earnings_screen.dart'; 
-
+import '../earnings/earnings_screen.dart';
 
 class InstructorHomeScreen extends StatefulWidget {
   const InstructorHomeScreen({super.key});
@@ -339,7 +338,9 @@ class _InstructorHomeScreenState extends State<InstructorHomeScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const InstructorBookingsScreen(),
+                                builder:
+                                    (context) =>
+                                        const InstructorBookingsScreen(),
                               ),
                             );
                           },
@@ -373,7 +374,10 @@ class _InstructorHomeScreenState extends State<InstructorHomeScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => ReviewAnalysisScreenWrapper(instructorId: user.uid),
+                                  builder:
+                                      (context) => ReviewAnalysisScreenWrapper(
+                                        instructorId: user.uid,
+                                      ),
                                 ),
                               );
                             }
@@ -392,10 +396,11 @@ class _InstructorHomeScreenState extends State<InstructorHomeScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => InstructorTimetableScreen(
-                                    instructorId: user.uid,
-                                    instructorName: _instructorName,
-                                  ),
+                                  builder:
+                                      (context) => InstructorTimetableScreen(
+                                        instructorId: user.uid,
+                                        instructorName: _instructorName,
+                                      ),
                                 ),
                               );
                             }

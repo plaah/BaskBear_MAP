@@ -644,4 +644,4 @@ class _NotificationScreenState extends State<NotificationScreen>
       return 'Just now';
     }
   }
-
+}

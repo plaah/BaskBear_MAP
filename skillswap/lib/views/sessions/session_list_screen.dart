@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../viewmodels/session_view_model.dart';
 import '../../models/session_model.dart';
-import '../bookings/booking_screen.dart';
 
 class SessionListScreen extends StatefulWidget {
   const SessionListScreen({super.key});
@@ -209,34 +208,6 @@ class _SessionListScreenState extends State<SessionListScreen> {
                 ),
               ),
             ),
-            // Tombol Book
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 12.0,
-                horizontal: 24.0,
-              ),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent,
-                    minimumSize: const Size(double.infinity, 45),
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => BookingScreen(sessionId: session.id),
-                      ),
-                    );
-                  },
-                  child: const Text(
-                    'Book Session',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ),
-              ),
-            ),
             // Expandable details
             Theme(
               data: Theme.of(context).copyWith(
@@ -344,20 +315,146 @@ class _SessionListScreenState extends State<SessionListScreen> {
     );
   }
 
-  // Keep your dialog and delete confirmation logic as is, but update their colors for consistency
   void _showEditDialog(
     BuildContext context,
     Session session,
     SessionViewModel vm,
   ) {
-    // ... keep your dialog logic, but update colors:
-    // - Dialog background: Color(0xFF232526)
-    // - TextFields: Color(0xFF2D2D2D), borderRadius 12, border color Color(0xFF5B81F7) on focus
-    // - Buttons: backgroundColor: Color(0xFF5B81F7), textColor: Colors.white
-    // - Use modern icons (edit_rounded, delete_outline_rounded)
-    // - Use white and blue accent for text/buttons
-    // - Use rounded corners throughout
-    // (For brevity, not repeating the full dialog code here. Just update colors/styles as above.)
+    final titleController = TextEditingController(text: session.title);
+    final descController = TextEditingController(text: session.description);
+    final priceController = TextEditingController(
+      text: session.price.toString(),
+    );
+    final locationController = TextEditingController(
+      text: session.location ?? '',
+    );
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF232526),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Text(
+            'Edit Session',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: titleController,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    labelText: 'Title',
+                    labelStyle: const TextStyle(color: Colors.white70),
+                    filled: true,
+                    fillColor: const Color(0xFF2D2D2D),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Color(0xFF5B81F7)),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: descController,
+                  style: const TextStyle(color: Colors.white),
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                    labelText: 'Description',
+                    labelStyle: const TextStyle(color: Colors.white70),
+                    filled: true,
+                    fillColor: const Color(0xFF2D2D2D),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Color(0xFF5B81F7)),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: priceController,
+                  style: const TextStyle(color: Colors.white),
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: 'Price',
+                    labelStyle: const TextStyle(color: Colors.white70),
+                    filled: true,
+                    fillColor: const Color(0xFF2D2D2D),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Color(0xFF5B81F7)),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: locationController,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    labelText: 'Location',
+                    labelStyle: const TextStyle(color: Colors.white70),
+                    filled: true,
+                    fillColor: const Color(0xFF2D2D2D),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Color(0xFF5B81F7)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.white54),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                final updatedSession = session.copyWith(
+                  title: titleController.text.trim(),
+                  description: descController.text.trim(),
+                  price:
+                      double.tryParse(priceController.text.trim()) ??
+                      session.price,
+                  location: locationController.text.trim(),
+                );
+                await vm.updateSession(updatedSession);
+                Navigator.pop(context);
+                setState(() {});
+              },
+              child: const Text(
+                'Save',
+                style: TextStyle(
+                  color: Color(0xFF5B81F7),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _showDeleteConfirmation(

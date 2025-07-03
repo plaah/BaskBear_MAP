@@ -48,7 +48,7 @@ dependencies:
   # New Features
   flutter_rating_bar: ^4.0.1  # For review system
   share_plus: ^7.2.2          # For social sharing
-  uni_links: ^0.5.1           # For deep links
+           # For deep links
 
   # Icons
   cupertino_icons: ^1.0.5

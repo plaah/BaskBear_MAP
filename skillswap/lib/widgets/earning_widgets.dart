@@ -24,10 +24,7 @@ class PeriodSelector extends StatelessWidget {
           children: [
             const Text(
               'Time Period',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
             SingleChildScrollView(
@@ -87,10 +84,7 @@ class TotalEarningsCard extends StatelessWidget {
             const SizedBox(height: 12),
             const Text(
               'Total Earnings (Paid)',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
+              style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
             const SizedBox(height: 8),
             Text(
@@ -125,10 +119,7 @@ class EarningsBreakdownCard extends StatelessWidget {
           children: [
             const Text(
               'Earnings Breakdown by Status',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             _buildEarningsRow(
@@ -157,7 +148,12 @@ class EarningsBreakdownCard extends StatelessWidget {
     );
   }
 
-  Widget _buildEarningsRow(String label, double amount, Color color, IconData icon) {
+  Widget _buildEarningsRow(
+    String label,
+    double amount,
+    Color color,
+    IconData icon,
+  ) {
     return Row(
       children: [
         Container(
@@ -218,10 +214,7 @@ class BookingStatsCard extends StatelessWidget {
           children: [
             const Text(
               'Booking Statistics',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             Row(
@@ -273,7 +266,12 @@ class BookingStatsCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+  Widget _buildStatCard(
+    String title,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -296,10 +294,7 @@ class BookingStatsCard extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             title,
-            style: const TextStyle(
-              fontSize: 12,
-              color: Colors.grey,
-            ),
+            style: const TextStyle(fontSize: 12, color: Colors.grey),
             textAlign: TextAlign.center,
           ),
         ],
@@ -326,18 +321,11 @@ class RecentBookingsCard extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              Icon(
-                Icons.inbox,
-                size: 48,
-                color: Colors.grey.shade400,
-              ),
+              Icon(Icons.inbox, size: 48, color: Colors.grey.shade400),
               const SizedBox(height: 12),
               Text(
                 'No bookings found',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey.shade600,
-                ),
+                style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
               ),
             ],
           ),
@@ -353,10 +341,7 @@ class RecentBookingsCard extends StatelessWidget {
           children: [
             const Text(
               'Recent Bookings',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             ...bookings.map((booking) {
@@ -399,16 +384,11 @@ class RecentBookingsCard extends StatelessWidget {
               children: [
                 Text(
                   session.title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: const TextStyle(fontWeight: FontWeight.w500),
                 ),
                 Text(
                   '${_formatDate(booking.bookingDate)} • \$${session.price.toStringAsFixed(2)}',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey.shade600,
-                  ),
+                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                 ),
               ],
             ),
@@ -416,9 +396,10 @@ class RecentBookingsCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: booking.paymentStatus 
-                  ? Colors.green.withOpacity(0.1)
-                  : Colors.orange.withOpacity(0.1),
+              color:
+                  booking.paymentStatus
+                      ? Colors.green.withOpacity(0.1)
+                      : Colors.orange.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
@@ -439,4 +420,3 @@ class RecentBookingsCard extends StatelessWidget {
     return '${date.day}/${date.month}/${date.year}';
   }
 }
-

@@ -119,4 +119,4 @@ class NotificationViewModel with ChangeNotifier {
     _error = null;
     notifyListeners();
   }
-
+}
