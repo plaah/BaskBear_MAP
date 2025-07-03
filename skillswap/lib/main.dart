@@ -9,6 +9,7 @@ import 'package:skillswap/services/auth_service.dart';
 import 'package:provider/provider.dart';
 import 'package:skillswap/viewmodels/instructor_view_model.dart';
 import 'package:skillswap/viewmodels/notification_view_model.dart';
+import 'package:skillswap/viewmodels/earnings_view_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,6 +31,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => NotificationViewModel(),
         ), // <-- ADD THIS LINE
+        ChangeNotifierProvider(
+          create: (_) => EarningsViewModel(),
+        ), 
       ],
       child: MaterialApp(
         title: 'SkillSwap',
