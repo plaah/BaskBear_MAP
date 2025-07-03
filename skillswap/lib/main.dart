@@ -8,11 +8,17 @@ import 'package:skillswap/viewmodels/booking_view_model.dart';
 import 'package:skillswap/services/auth_service.dart';
 import 'package:provider/provider.dart';
 import 'package:skillswap/viewmodels/instructor_view_model.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:skillswap/viewmodels/notification_view_model.dart';
+import 'package:skillswap/viewmodels/earnings_view_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await dotenv.load(fileName: ".env");
+
+  Stripe.publishableKey = dotenv.env['STRIPE_PUBLISHABLE_KEY']!;
   runApp(const MyApp());
 }
 
@@ -27,9 +33,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => SessionViewModel()),
         ChangeNotifierProvider(create: (_) => BookingViewModel()),
         ChangeNotifierProvider(create: (_) => InstructorViewModel()),
-        ChangeNotifierProvider(
-          create: (_) => NotificationViewModel(),
-        ), // <-- ADD THIS LINE
+        ChangeNotifierProvider(create: (_) => NotificationViewModel()),
+        ChangeNotifierProvider(create: (_) => EarningsViewModel()),
       ],
       child: MaterialApp(
         title: 'SkillSwap',
