@@ -10,6 +10,11 @@ import 'package:skillswap/views/notifications/notification_screen.dart';
 import 'package:skillswap/firebase_options.dart'; // Import the provided Firebase options
 import '../bookings/instructor_bookings_screen.dart';
 
+import '../reviews/review_analysis_screen.dart';
+
+import '../earnings/earnings_screen.dart'; 
+
+
 class InstructorHomeScreen extends StatefulWidget {
   const InstructorHomeScreen({super.key});
 
@@ -340,13 +345,39 @@ class _InstructorHomeScreenState extends State<InstructorHomeScreen> {
                           },
                         ),
                         _buildFeatureCard(
+                          icon: Icons.account_balance_wallet,
+                          title: 'My Earnings',
+                          iconColor: const Color(0xFF4CAF50), // Green for money
+                          backgroundGradient: const LinearGradient(
+                            colors: [Color(0xFFE8F5E9), Color(0xFFC8E6C9)],
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const EarningsScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                        _buildFeatureCard(
                           icon: Icons.analytics,
-                          title: 'Analytics',
+                          title: 'Review Analysis',
                           iconColor: const Color(0xFF7C4DFF), // Vibrant Purple
                           backgroundGradient: const LinearGradient(
                             colors: [Color(0xFFF3E5F5), Color(0xFFE1BEE7)],
                           ),
-                          onTap: () {},
+                          onTap: () {
+                            final user = FirebaseAuth.instance.currentUser;
+                            if (user != null) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ReviewAnalysisScreenWrapper(instructorId: user.uid),
+                                ),
+                              );
+                            }
+                          },
                         ),
                         _buildFeatureCard(
                           icon: Icons.calendar_today,

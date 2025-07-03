@@ -6,6 +6,8 @@ class BookingModel {
   final String status;
   final bool paymentStatus;
   final String? additionalNotes;
+  final bool isDone;
+  final bool isReview;
 
   BookingModel({
     required this.id,
@@ -15,6 +17,8 @@ class BookingModel {
     this.status = 'pending',
     this.paymentStatus = false,
     this.additionalNotes,
+    this.isDone = false,
+    this.isReview = false,
   });
 
   factory BookingModel.fromMap(Map<String, dynamic> map, String id) {
@@ -26,6 +30,8 @@ class BookingModel {
       status: map['status'] ?? 'pending',
       paymentStatus: map['paymentStatus'] ?? false,
       additionalNotes: map['additionalNotes'],
+      isDone: map['isDone'] ?? false,
+      isReview: map['isReview'] ?? false,
     );
   }
 
@@ -37,6 +43,8 @@ class BookingModel {
       'status': status,
       'paymentStatus': paymentStatus,
       'additionalNotes': additionalNotes,
+      'isDone': isDone,
+      'isReview': isReview,
     };
   }
 
@@ -48,6 +56,8 @@ class BookingModel {
     String? status,
     bool? paymentStatus,
     String? additionalNotes,
+    bool? isDone,
+    bool? isReview,
   }) {
     return BookingModel(
       id: id ?? this.id,
@@ -57,6 +67,8 @@ class BookingModel {
       status: status ?? this.status,
       paymentStatus: paymentStatus ?? this.paymentStatus,
       additionalNotes: additionalNotes ?? this.additionalNotes,
+      isDone: isDone ?? this.isDone,
+      isReview: isReview ?? this.isReview,
     );
   }
 }

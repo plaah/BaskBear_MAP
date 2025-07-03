@@ -111,4 +111,4 @@ class NotificationService {
           return notifications;
         });
   }
-}
+

@@ -7,6 +7,9 @@ class CourseCard extends StatelessWidget {
   final VoidCallback? onTap;
   final bool showEnrollButton;
   final VoidCallback? onEnroll;
+  final bool isDone;
+  final bool isReview;
+  final VoidCallback? onReview;
 
   const CourseCard({
     super.key,
@@ -14,9 +17,11 @@ class CourseCard extends StatelessWidget {
     this.onTap,
     this.showEnrollButton = false,
     this.onEnroll,
+    this.isDone = false,
+    this.isReview = false,
+    this.onReview,
   });
 
-  // Updated with more sophisticated and eye-soothing colors
   IconData _categoryIcon(String category) {
     switch (category.toLowerCase()) {
       case 'design':
@@ -40,7 +45,6 @@ class CourseCard extends StatelessWidget {
     }
   }
 
-  // More sophisticated and classy color gradients
   List<Color> _categoryGradient(String category) {
     switch (category.toLowerCase()) {
       case 'design':
@@ -58,7 +62,7 @@ class CourseCard extends StatelessWidget {
         return [
           const Color(0xFF8B5CF6),
           const Color(0xFFA855F7),
-        ]; // Changed to purple tones
+        ];
       case 'music':
         return [const Color(0xFF667eea), const Color(0xFF764ba2)];
       case 'language':
@@ -82,7 +86,7 @@ class CourseCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
         child: Container(
-          height: 160, // Reduced from 200 to make more compact
+          height: 160,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
             gradient: LinearGradient(
@@ -103,24 +107,23 @@ class CourseCard extends StatelessWidget {
                   top: Radius.circular(16),
                 ),
                 child: Container(
-                  height: 45, // Reduced from 60
+                  height: 45,
                   width: double.infinity,
-                  child:
-                      session.image.isNotEmpty
-                          ? Image.network(
-                            session.image,
-                            fit: BoxFit.cover,
-                            errorBuilder:
-                                (context, error, stackTrace) =>
-                                    _buildPlaceholderIcon(session.category),
-                          )
-                          : _buildPlaceholderIcon(session.category),
+                  child: session.image.isNotEmpty
+                      ? Image.network(
+                          session.image,
+                          fit: BoxFit.cover,
+                          errorBuilder:
+                              (context, error, stackTrace) =>
+                                  _buildPlaceholderIcon(session.category),
+                        )
+                      : _buildPlaceholderIcon(session.category),
                 ),
               ),
               // Compact content
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(10), // Reduced from 12
+                  padding: const EdgeInsets.all(10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -240,6 +243,42 @@ class CourseCard extends StatelessWidget {
                             ),
                         ],
                       ),
+                      // Show "Done" and "Write Review" if isDone is true
+                      if (isDone) ...[
+                        const SizedBox(height: 6),
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.green.shade100,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: const Text(
+                                'Done',
+                                style: TextStyle(
+                                  color: Colors.green,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            if (!isReview && onReview != null)
+                              ElevatedButton.icon(
+                                onPressed: onReview,
+                                icon: const Icon(Icons.rate_review, color: Colors.white, size: 16),
+                                label: const Text('Write Review', style: TextStyle(color: Colors.white)),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blue,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -269,7 +308,7 @@ class CourseCard extends StatelessWidget {
       child: Center(
         child: Icon(
           icon,
-          size: 24, // Reduced size
+          size: 24,
           color: Colors.white.withOpacity(0.9),
         ),
       ),
@@ -304,7 +343,7 @@ class CourseCard extends StatelessWidget {
 
   Widget _buildEnrollButton(Color primaryColor) {
     return Container(
-      height: 24, // Reduced height
+      height: 24,
       child: ElevatedButton(
         onPressed: onEnroll,
         style: ElevatedButton.styleFrom(
