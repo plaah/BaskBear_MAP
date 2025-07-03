@@ -6,6 +6,7 @@ abstract class SessionService {
   Future<void> createSession(Session session);
   Future<List<Session>> getSessions();
   Future<void> deleteSession(String sessionId);
+  Future<Session?> getSessionById(String sessionId);
 }
 
 class FirestoreSessionService implements SessionService {
@@ -60,6 +61,19 @@ class FirestoreSessionService implements SessionService {
       rethrow;
     }
   }
+
+  @override
+  Future<Session?> getSessionById(String sessionId) async {
+    try {
+      final doc = await _firestore.collection(_collection).doc(sessionId).get();
+      if (!doc.exists) return null;
+      final data = doc.data() as Map<String, dynamic>;
+      return Session.fromMap(data, doc.id);
+    } catch (e) {
+      debugPrint('Error fetching session by ID: $e');
+      return null;
+    }
+  }
 }
 
 // Mock implementation for demonstration (keep this for testing)
@@ -82,5 +96,11 @@ class SessionMockService implements SessionService {
   @override
   Future<void> deleteSession(String sessionId) async {
     _sessions.removeWhere((session) => session.title == sessionId);
+  }
+
+  @override
+  Future<Session?> getSessionById(String sessionId) async {
+    await Future.delayed(const Duration(seconds: 1));
+    return _sessions.firstWhere((session) => session.title == sessionId);
   }
 }

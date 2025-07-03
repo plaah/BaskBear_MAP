@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../viewmodels/booking_view_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../views/reviews/review_dialog.dart';
+import '../../viewmodels/review_view_model.dart';
+import '../../services/session_service.dart';
 
 class MyBookingScreen extends StatefulWidget {
   const MyBookingScreen({super.key});
@@ -16,7 +19,9 @@ class _MyBookingScreenState extends State<MyBookingScreen>
   late AnimationController _animationController;
   late AnimationController _pulseController;
   late Animation<double> _fadeAnimation;
-  late Animation<double> _pulseAnimation;
+
+   late Animation<double> _pulseAnimation;
+ final FirestoreSessionService _sessionService = FirestoreSessionService();
 
   @override
   void initState() {
@@ -460,6 +465,59 @@ class _MyBookingScreenState extends State<MyBookingScreen>
                         // Action Buttons
                         Row(
                           children: [
+
+                            if (booking.isDone) ...[
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: Colors.green.shade100,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: const Text(
+                                  'Done',
+                                  style: TextStyle(
+                                    color: Colors.green,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              if (!booking.isReview)
+                                ElevatedButton.icon(
+                                  onPressed: () async {
+                                    final session = await _sessionService.getSessionById(booking.sessionId);
+                                    final result = await showDialog(
+                                      context: context,
+                                      builder: (context) => ChangeNotifierProvider(
+                                        create: (_) => ReviewViewModel(),
+                                        child: ReviewDialog(
+                                          sessionId: booking.sessionId,
+                                          instructorId: session?.instructorId ?? '',
+                                          sessionTitle: session?.title ?? 'Session',
+                                          instructorName: session?.instructor ?? 'Instructor',
+                                        ),
+                                      ),
+                                    );
+                                    if (result != null) {
+                                      // After review, update isReview
+                                      await _viewModel.updateBookingFields(booking.id, {'isReview': true});
+                                      final user = FirebaseAuth.instance.currentUser;
+                                      if (user != null) {
+                                        await _viewModel.fetchBookingsByUserId(user.uid);
+                                      }
+                                    }
+                                  },
+                                  icon: const Icon(Icons.rate_review, color: Colors.white, size: 18),
+                                  label: const Text('Write Review', style: TextStyle(color: Colors.white)),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.blue,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                ),
+                            ],
+
                             Expanded(
                               child: Container(
                                 decoration: BoxDecoration(
@@ -1186,4 +1244,4 @@ class _MyBookingScreenState extends State<MyBookingScreen>
       ),
     );
   }
-}
+

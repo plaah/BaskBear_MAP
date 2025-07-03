@@ -313,4 +313,3 @@ class _SearchWithFiltersState extends State<SearchWithFilters> {
         return Icons.category_outlined;
     }
   }
-}

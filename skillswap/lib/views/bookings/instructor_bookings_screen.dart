@@ -937,4 +937,4 @@ class _InstructorBookingsScreenState extends State<InstructorBookingsScreen>
       ),
     );
   }
-}
+
