@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../models/session_model.dart';
 
 class SessionCard extends StatelessWidget {
@@ -53,16 +52,15 @@ class SessionCard extends StatelessWidget {
                       width: 80,
                       height: 80,
                       fit: BoxFit.cover,
-                      errorBuilder:
-                          (context, error, stackTrace) => Container(
-                            width: 80,
-                            height: 80,
-                            color: Colors.grey[300],
-                            child: const Icon(
-                              Icons.image_not_supported,
-                              color: Color(0xFF666666),
-                            ),
-                          ),
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        width: 80,
+                        height: 80,
+                        color: Colors.grey[300],
+                        child: const Icon(
+                          Icons.image_not_supported,
+                          color: Color(0xFF666666),
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -160,6 +158,92 @@ class SessionCard extends StatelessWidget {
                     ),
                 ],
               ),
+              // Show Done/Review Buttons if provided
+              if (isDone || isReviewed || onDone != null || onReview != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 12.0),
+                  child: Row(
+                    children: [
+                      if (onDone != null)
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: onDone,
+                            icon: Icon(
+                              isDone ? Icons.check_circle : Icons.check_circle_outline,
+                              size: 18,
+                              color: isDone ? const Color(0xFF2E7D32) : Colors.white,
+                            ),
+                            label: Text(
+                              isDone ? 'Completed' : 'Mark Done',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                                color: isDone ? const Color(0xFF2E7D32) : Colors.white,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: isDone
+                                  ? const Color(0xFF2E7D32).withOpacity(0.15)
+                                  : const Color(0xFF2E7D32),
+                              foregroundColor: isDone
+                                  ? const Color(0xFF2E7D32)
+                                  : Colors.white,
+                              elevation: isDone ? 0 : 2,
+                              side: isDone
+                                  ? BorderSide(color: const Color(0xFF2E7D32).withOpacity(0.3))
+                                  : null,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(24),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 14,
+                              ),
+                            ),
+                          ),
+                        ),
+                      if (onDone != null && onReview != null) const SizedBox(width: 16),
+                      if (onReview != null)
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: onReview,
+                            icon: Icon(
+                              isReviewed ? Icons.star : Icons.star_outline,
+                              size: 18,
+                              color: isReviewed ? const Color(0xFF1565C0) : Colors.white,
+                            ),
+                            label: Text(
+                              isReviewed ? 'Reviewed' : 'Add Review',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                                color: isReviewed ? const Color(0xFF1565C0) : Colors.white,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: isReviewed
+                                  ? const Color(0xFF1565C0).withOpacity(0.15)
+                                  : const Color(0xFF1565C0),
+                              foregroundColor: isReviewed
+                                  ? const Color(0xFF1565C0)
+                                  : Colors.white,
+                              elevation: isReviewed ? 0 : 2,
+                              side: isReviewed
+                                  ? BorderSide(color: const Color(0xFF1565C0).withOpacity(0.3))
+                                  : null,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(24),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 14,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
             ],
           ),
         ),
@@ -197,7 +281,6 @@ class SessionCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-            
             // Session Image
             Center(
               child: ClipRRect(
@@ -220,9 +303,7 @@ class SessionCard extends StatelessWidget {
                 ),
               ),
             ),
-            
             const SizedBox(height: 20),
-            
             // Title
             Text(
               session.title,
@@ -232,9 +313,7 @@ class SessionCard extends StatelessWidget {
                 color: Color(0xFF000000),
               ),
             ),
-            
             const SizedBox(height: 8),
-            
             // Instructor
             Text(
               'by ${session.instructor}',
@@ -244,9 +323,7 @@ class SessionCard extends StatelessWidget {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            
             const SizedBox(height: 16),
-            
             // Info chips
             Row(
               children: [
@@ -269,9 +346,7 @@ class SessionCard extends StatelessWidget {
                 ),
               ],
             ),
-            
             const SizedBox(height: 20),
-            
             // Description
             if (session.description.isNotEmpty) ...[
               const Text(
@@ -293,100 +368,88 @@ class SessionCard extends StatelessWidget {
               ),
               const SizedBox(height: 24),
             ],
-            
             // Action buttons section
             Row(
               children: [
-                // Done Button
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: onDone,
-                    icon: Icon(
-                      isDone ? Icons.check_circle : Icons.check_circle_outline,
-                      size: 18,
-                      color: isDone 
-                          ? const Color(0xFF2E7D32) 
-                          : Colors.white,
-                    ),
-                    label: Text(
-                      isDone ? 'Completed' : 'Mark Done',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                        color: isDone 
-                            ? const Color(0xFF2E7D32) 
+                if (onDone != null)
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: onDone,
+                      icon: Icon(
+                        isDone ? Icons.check_circle : Icons.check_circle_outline,
+                        size: 18,
+                        color: isDone ? const Color(0xFF2E7D32) : Colors.white,
+                      ),
+                      label: Text(
+                        isDone ? 'Completed' : 'Mark Done',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                          color: isDone ? const Color(0xFF2E7D32) : Colors.white,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isDone
+                            ? const Color(0xFF2E7D32).withOpacity(0.15)
+                            : const Color(0xFF2E7D32),
+                        foregroundColor: isDone
+                            ? const Color(0xFF2E7D32)
                             : Colors.white,
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isDone 
-                          ? const Color(0xFF2E7D32).withOpacity(0.15)
-                          : const Color(0xFF2E7D32),
-                      foregroundColor: isDone 
-                          ? const Color(0xFF2E7D32) 
-                          : Colors.white,
-                      elevation: isDone ? 0 : 2,
-                      side: isDone 
-                          ? BorderSide(color: const Color(0xFF2E7D32).withOpacity(0.3))
-                          : null,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 14,
+                        elevation: isDone ? 0 : 2,
+                        side: isDone
+                            ? BorderSide(color: const Color(0xFF2E7D32).withOpacity(0.3))
+                            : null,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 14,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                
-                const SizedBox(width: 16),
-                
-                // Review Button
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: onReview,
-                    icon: Icon(
-                      isReviewed ? Icons.star : Icons.star_outline,
-                      size: 18,
-                      color: isReviewed 
-                          ? const Color(0xFF1565C0) 
-                          : Colors.white,
-                    ),
-                    label: Text(
-                      isReviewed ? 'Reviewed' : 'Add Review',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                        color: isReviewed 
-                            ? const Color(0xFF1565C0) 
+                if (onDone != null && onReview != null) const SizedBox(width: 16),
+                if (onReview != null)
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: onReview,
+                      icon: Icon(
+                        isReviewed ? Icons.star : Icons.star_outline,
+                        size: 18,
+                        color: isReviewed ? const Color(0xFF1565C0) : Colors.white,
+                      ),
+                      label: Text(
+                        isReviewed ? 'Reviewed' : 'Add Review',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                          color: isReviewed ? const Color(0xFF1565C0) : Colors.white,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isReviewed
+                            ? const Color(0xFF1565C0).withOpacity(0.15)
+                            : const Color(0xFF1565C0),
+                        foregroundColor: isReviewed
+                            ? const Color(0xFF1565C0)
                             : Colors.white,
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isReviewed 
-                          ? const Color(0xFF1565C0).withOpacity(0.15)
-                          : const Color(0xFF1565C0),
-                      foregroundColor: isReviewed 
-                          ? const Color(0xFF1565C0) 
-                          : Colors.white,
-                      elevation: isReviewed ? 0 : 2,
-                      side: isReviewed 
-                          ? BorderSide(color: const Color(0xFF1565C0).withOpacity(0.3))
-                          : null,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 14,
+                        elevation: isReviewed ? 0 : 2,
+                        side: isReviewed
+                            ? BorderSide(color: const Color(0xFF1565C0).withOpacity(0.3))
+                            : null,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 14,
+                        ),
                       ),
                     ),
                   ),
-                ),
               ],
             ),
-            
             // Close button
             const SizedBox(height: 16),
             SizedBox(
@@ -406,8 +469,6 @@ class SessionCard extends StatelessWidget {
                 ),
               ),
             ),
-            
-            // Safe area padding
             SizedBox(height: MediaQuery.of(context).padding.bottom),
           ],
         ),

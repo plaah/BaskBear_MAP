@@ -12,6 +12,7 @@ import '../../widgets/empty_state.dart';
 import '../bookings/advanced_booking_screen.dart';
 import '../profile/student/student_profile_screen.dart';
 import '../onboarding/splash_screen.dart';
+
 import '../../viewmodels/booking_view_model.dart';
 import '../../models/booking_model.dart';
 import '../../views/reviews/review_dialog.dart';
@@ -27,6 +28,7 @@ extension IterableExtension<T> on Iterable<T> {
     return null;
   }
 }
+
 
 class StudentDashboardScreen extends StatefulWidget {
   final String studentId;
@@ -126,6 +128,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                   );
                 }
 
+
                 return SliverList(
                   delegate: SliverChildBuilderDelegate((context, index) {
                     final session = filteredSessions[index];
@@ -178,10 +181,22 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                         showEnrollButton: false,
                       );
                     }
+
+                return SliverGrid(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.75,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                  ),
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final session = filteredSessions[index];
+
                     return CourseCard(
                       session: session,
                       showEnrollButton: _selectedTab == 'available',
                       onEnroll: () => _enrollInSession(session),
+
                       onTap: () => _showSessionDetails(session, booking),
                       isDone: booking?.isDone ?? false,
                       isReview: booking?.isReview ?? false,
@@ -210,6 +225,9 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                             }
                           }
                         : null,
+
+                      onTap: () => _showSessionDetails(session),
+
                     );
                   }, childCount: filteredSessions.length),
                 );
@@ -629,8 +647,12 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                       const SizedBox(height: 18),
                       Text(
                         session.title,
+
                         style: const TextStyle(
                           color: Colors.black87,
+
+                     
+
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 0.2,
@@ -711,6 +733,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                           ),
                         ),
                       const SizedBox(height: 10),
+
                       if (booking != null && booking.isDone) ...[
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -742,6 +765,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                             ),
                           ),
                       ],
+
                     ],
                   ),
                 ),

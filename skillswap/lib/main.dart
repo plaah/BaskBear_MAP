@@ -10,6 +10,8 @@ import 'package:provider/provider.dart';
 import 'package:skillswap/viewmodels/instructor_view_model.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:skillswap/viewmodels/notification_view_model.dart';
+import 'package:skillswap/viewmodels/earnings_view_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,6 +33,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => SessionViewModel()),
         ChangeNotifierProvider(create: (_) => BookingViewModel()),
         ChangeNotifierProvider(create: (_) => InstructorViewModel()),
+        ChangeNotifierProvider(create: (_) => NotificationViewModel()),
+        ChangeNotifierProvider(create: (_) => EarningsViewModel()),
       ],
       child: MaterialApp(
         title: 'SkillSwap',

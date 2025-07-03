@@ -19,8 +19,9 @@ class _MyBookingScreenState extends State<MyBookingScreen>
   late AnimationController _animationController;
   late AnimationController _pulseController;
   late Animation<double> _fadeAnimation;
-  late Animation<double> _pulseAnimation;
-  final FirestoreSessionService _sessionService = FirestoreSessionService();
+
+   late Animation<double> _pulseAnimation;
+ final FirestoreSessionService _sessionService = FirestoreSessionService();
 
   @override
   void initState() {
@@ -464,6 +465,7 @@ class _MyBookingScreenState extends State<MyBookingScreen>
                         // Action Buttons
                         Row(
                           children: [
+
                             if (booking.isDone) ...[
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -515,6 +517,7 @@ class _MyBookingScreenState extends State<MyBookingScreen>
                                   ),
                                 ),
                             ],
+
                             Expanded(
                               child: Container(
                                 decoration: BoxDecoration(
@@ -1241,4 +1244,4 @@ class _MyBookingScreenState extends State<MyBookingScreen>
       ),
     );
   }
-}
+

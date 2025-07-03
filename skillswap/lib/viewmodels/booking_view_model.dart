@@ -22,8 +22,9 @@ class BookingViewModel with ChangeNotifier {
     try {
       _isLoading = true;
       notifyListeners();
-      
+
       _bookings = await _bookingService.getBookingsByUserId(userId);
+
       // Check and update isDone for each booking
       for (var i = 0; i < _bookings.length; i++) {
         final booking = _bookings[i];
@@ -39,6 +40,7 @@ class BookingViewModel with ChangeNotifier {
           }
         }
       }
+
       _isLoading = false;
       notifyListeners();
     } catch (e) {
@@ -48,19 +50,23 @@ class BookingViewModel with ChangeNotifier {
     }
   }
 
-  // Fetch all bookings for an instructor
+  // Fetch all bookings for an instructor (updated to use sessions)
   Future<void> loadInstructorBookings(String instructorId) async {
     try {
       _isLoading = true;
       notifyListeners();
-      
-      _bookings = await _bookingService.getBookingsByInstructorId(instructorId);
-      
+
+      // Use the new method that gets bookings through sessions
+      _bookings = await _bookingService.getBookingsForInstructorSessions(
+        instructorId,
+      );
+
       _isLoading = false;
       notifyListeners();
     } catch (e) {
       _isLoading = false;
       notifyListeners();
+      print('Error loading instructor bookings: $e');
       throw Exception('Failed to fetch instructor bookings: $e');
     }
   }
@@ -75,7 +81,7 @@ class BookingViewModel with ChangeNotifier {
     }
   }
 
-  // Create a new booking
+  // Create a new booking (this will now send notification automatically)
   Future<void> createBooking(BookingModel booking) async {
     try {
       await _bookingService.createBooking(booking);
@@ -106,7 +112,9 @@ class BookingViewModel with ChangeNotifier {
       await _bookingService.updatePaymentStatus(bookingId, paymentStatus);
       final index = _bookings.indexWhere((booking) => booking.id == bookingId);
       if (index != -1) {
-        _bookings[index] = _bookings[index].copyWith(paymentStatus: paymentStatus);
+        _bookings[index] = _bookings[index].copyWith(
+          paymentStatus: paymentStatus,
+        );
       }
       notifyListeners();
     } catch (e) {
@@ -125,6 +133,7 @@ class BookingViewModel with ChangeNotifier {
     }
   }
 
+  // Additional methods from payment-try2
   Future<void> fetchInstructorBookings(String instructorId) async {
     await loadInstructorBookings(instructorId);
   }
