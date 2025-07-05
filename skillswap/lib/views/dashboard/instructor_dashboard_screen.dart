@@ -9,10 +9,9 @@ import 'package:skillswap/views/timetable/timetable_screen.dart';
 import 'package:skillswap/views/notifications/notification_screen.dart';
 import 'package:skillswap/firebase_options.dart'; // Import the provided Firebase options
 import '../bookings/instructor_bookings_screen.dart';
-
 import '../reviews/review_analysis_screen.dart';
-
 import '../earnings/earnings_screen.dart';
+import '../../views/chat/open_chat_list_button.dart';
 
 class InstructorHomeScreen extends StatefulWidget {
   const InstructorHomeScreen({super.key});
@@ -223,6 +222,32 @@ class _InstructorHomeScreenState extends State<InstructorHomeScreen> {
                                   );
                                 },
                               ),
+                              // --- CHAT BUTTON ADDED HERE ---
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.chat,
+                                  color: Colors.white,
+                                  size: 26,
+                                ),
+                                tooltip: 'Chat',
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) => Scaffold(
+                                            appBar: AppBar(
+                                              title: const Text('Chats'),
+                                            ),
+                                            body: OpenChatListButton(
+                                              isInstructor: true,
+                                            ),
+                                          ),
+                                    ),
+                                  );
+                                },
+                              ),
+                              // --- END CHAT BUTTON ---
                               IconButton(
                                 icon: const Icon(
                                   Icons.exit_to_app,
@@ -409,6 +434,10 @@ class _InstructorHomeScreenState extends State<InstructorHomeScreen> {
                       ],
                     ),
                     const SizedBox(height: 32),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                      child: OpenChatListButton(isInstructor: true),
+                    ),
                   ],
                 ),
               ),

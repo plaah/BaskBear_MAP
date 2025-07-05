@@ -5,6 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../views/reviews/review_dialog.dart';
 import '../../viewmodels/review_view_model.dart';
 import '../../services/session_service.dart';
+import '../../services/chat_service.dart';
+import '../../views/chat/chat_screen.dart';
 
 class MyBookingScreen extends StatefulWidget {
   const MyBookingScreen({super.key});
@@ -538,6 +540,54 @@ class _MyBookingScreenState extends State<MyBookingScreen>
                                   ),
                                 ),
                               ),
+                            // Open Chat Button
+                            ElevatedButton.icon(
+                              onPressed: () async {
+                                final user = FirebaseAuth.instance.currentUser;
+                                final session = await _sessionService
+                                    .getSessionById(booking.sessionId);
+                                if (user == null || session == null) return;
+                                final instructorId = session.instructorId;
+                                final instructorName =
+                                    session.instructor ?? 'Instructor';
+                                final studentId = user.uid;
+                                final chatService = ChatService();
+                                // Find or create chat room
+                                final chatRoom = await chatService
+                                    .createOrGetChatRoom(
+                                      bookingId: booking.id,
+                                      studentId: studentId,
+                                      instructorId: instructorId,
+                                    );
+                                // Navigate to ChatScreen
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (_) => ChatScreen(
+                                          chatRoom: chatRoom,
+                                          currentUserId: studentId,
+                                          otherUserName: instructorName,
+                                        ),
+                                  ),
+                                );
+                              },
+                              icon: const Icon(
+                                Icons.chat_bubble_outline,
+                                color: Colors.white,
+                                size: 18,
+                              ),
+                              label: const Text(
+                                'Open Chat',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.deepPurple,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
                             Container(
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
